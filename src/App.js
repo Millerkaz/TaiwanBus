@@ -1,25 +1,19 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from "react";
+import { Router, Route } from "react-router-dom";
+import history from "./helper/history";
+import BusRoutePopup from "./views/busRoutePopup/busRoutePopup";
+import Main from "./views/main/main";
+import LeafletMap from "./components/leafletMap/leafletMap";
+import "./sass/index.scss";
 
-function App() {
+const App = (props) => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router history={history}>
+      <Route path="/" component={Main} />
+      <Route path="/:city/:routeUID" exact component={BusRoutePopup} />
+      <LeafletMap />
+    </Router>
   );
-}
+};
 
 export default App;

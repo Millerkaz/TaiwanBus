@@ -1,0 +1,71 @@
+$color__main: #00a8c0;
+$color__main--light80: #00a8c0cc;
+$color__main--light60: #00a8c099;
+$color__main--light10: #00a8c01a;
+$color__main--dark10: #009bb1;
+
+$color__2nd: #d9ef08;
+$color__2nd--light80: #d9ef08cc;
+$color__2nd--light60: #d9ef0899;
+$color__2nd--light20: #d9ef0833;
+$color__2nd--dark20: #c8dc07;
+
+$color--wite: #ffffff;
+$color--grey-L: #c8c9cc;
+
+//btn 預設色彩
+$color__font--btn: #ffffff;
+$color__bg--btn: #00a8c0;
+$color__bg--btn-hover: #009bb1;
+
+$rwd-largest: 1500px;
+$rwd-large: 1100px;
+$rwd-medium: 800px;
+$rwd-small: 700px;
+$rwd-smallest: 450px;
+
+@keyframes moveToRight {
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(2000%);
+  }
+}
+
+@keyframes moveToLeft {
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-2000%);
+  }
+}
+
+@keyframes pulse-toDown {
+  0% {
+    transform: translateY(0%);
+  }
+
+  50% {
+    transform: translateY(10%);
+  }
+
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+@keyframes pulse-shadow {
+  0% {
+    filter: drop-shadow(0px 0px 0px #00a8c0);
+  }
+  50% {
+    filter: drop-shadow(0px 0px 10px #00a8c0);
+  }
+  100% {
+    filter: drop-shadow(0px 0px 0px #00a8c0);
+  }
+}

@@ -1,0 +1,93 @@
+/* linkBtn & btn */
+@import "../../sass/variable.scss";
+
+.btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.6rem;
+  line-height: 2.3rem;
+  background-color: $color__bg--btn;
+  font-family: inherit;
+  color: $color__font--btn;
+  font-style: normal;
+  font-weight: 700;
+  border-radius: 100px;
+  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.16);
+  padding: 1rem;
+
+  &:visited {
+    color: $color__font--btn;
+  }
+
+  &:active {
+    background-color: $color__bg--btn;
+    box-shadow: 0px 0px 16px $color__bg--btn;
+  }
+  &:hover {
+    cursor: pointer;
+    background-color: $color__bg--btn-hover;
+  }
+
+  &--active {
+    background: linear-gradient(
+        180deg,
+        rgba(239, 239, 239, 0) 0%,
+        rgba(206, 206, 206, 0.2) 100%
+      ),
+      #f5f5f5;
+    box-shadow: 2px 2px 3px -2px rgba(0, 0, 0, 0.25),
+      inset 3px 2px 5px rgba(0, 0, 0, 0.3);
+    border-radius: 4rem;
+  }
+}
+
+.btn--search {
+  margin-right: 1rem;
+  padding: 1.45rem 2rem;
+  // flex: 1;
+
+  // @media only screen and (max-width: $rwd-smallest) {
+  //   width: 25rem;
+  // }
+
+  img {
+    margin-left: 0.65rem;
+  }
+}
+
+.btn--location {
+  width: 5rem;
+  height: 5rem;
+  background: #ffffff;
+  box-shadow: 0px 4px 10px rgba(50, 50, 51, 0.25);
+  border-radius: 100px;
+  margin-right: 1rem;
+  transition: all 0.2s;
+
+  img {
+    width: 2.567rem;
+    height: 2.567rem;
+  }
+
+  &:hover {
+    background-color: #ffffff;
+    transform: scale(1.1);
+  }
+
+  &:active {
+    background-color: #ffffff;
+    transform: scale(1.1) translateY(5%);
+    box-shadow: 0px 1px 5px rgba(50, 50, 51, 0.25);
+  }
+}
+
+.btn--detailCard {
+  margin-top: 1rem;
+  border-radius: 10rem;
+}
+
+.btn--pageBar {
+  margin-right: 1.2rem;
+  border-radius: 40rem;
+}
