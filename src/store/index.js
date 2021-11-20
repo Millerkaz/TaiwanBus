@@ -6,11 +6,8 @@ import { cityObj, dataFilterHelper } from "../helper";
 //*---------------- type ---------------- *//
 
 const FETCH_DATA = "FETCH_DATA";
-const FETCH_DATA_BY_ROUTE = "FETCH_DATA_BY_ROUTE";
-const FETCH_DATA_BY_STOP_NAME = "FETCH_DATA_BY_STOP_NAME";
-const FETCH_DATA_BY_STATION_ID = "FETCH_DATA_BY_STATION_ID";
+const REFETCH_NOW_BUS = "REFETCH_NOW_BUS";
 const TARGET_BUS_ONCLICK = "TARGET_BUS_ONCLICK";
-
 const CLEAR_NEAR_DATA = "CLEAR_NEAR_DATA";
 
 const SELECT_ROAD = "SELECT_ROAD";
@@ -66,6 +63,7 @@ export const action = {
         type: FETCH_DATA,
         payload: {
           searchBy: "route",
+          city,
           data: routeData,
         },
       });
@@ -107,6 +105,7 @@ export const action = {
         type: FETCH_DATA,
         payload: {
           searchBy: "stop",
+          city,
           data,
         },
       });
@@ -147,25 +146,54 @@ export const action = {
 
   ///////////////////////////////////////////////////////////
 
-  targetBusOnClickCreator: (searchBy, routeName) => {
-    if (searchBy === "route") {
-      return async (dispatch) => {
-        const busPosition = PTX.get();
-        const busCurrentStop = PTX.get();
-        const routeShape = PTX.get();
+  targetBusOnClickCreator: (routeName, city, stopsArray) => {
+    return async (dispatch) => {
+      const busPosition = PTX.get(
+        `/v2/Bus/RealTimeNearStop/City/${city}/${routeName}?$top=1000&$format=JSON`
+      );
+      const busCurrentStop = PTX.get(
+        `/v2/Bus/RealTimeByFrequency/City/${city}/${routeName}?$top=1000&$format=JSON`
+      );
+      const routeShape = PTX.get(
+        `/v2/Bus/Shape/City/${city}?$filter=RouteName%2FZh_tw%20eq%20'${routeName}'&$top=1000&$format=JSON`
+      );
 
-        const data = await Promise.all([
-          busPosition,
-          busCurrentStop,
-          routeShape,
-        ]);
+      const data = await Promise.all([busPosition, busCurrentStop, routeShape]);
 
-        dispatch({ type: TARGET_BUS_ONCLICK, payload: data });
-      };
-    }
+      console.log(data);
 
-    if (searchBy === "stop") {
-    }
+      dispatch({
+        type: TARGET_BUS_ONCLICK,
+        payload: {
+          target: { routeName, city },
+          busPosition: data[0].data,
+          busCurrentStop: data[1].data,
+          routeShape: data[2].data,
+          routeStops: stopsArray,
+        },
+      });
+    };
+  },
+
+  reFetchNowBus: (routeName, city) => {
+    return async (dispatch) => {
+      const busPosition = PTX.get(
+        `/v2/Bus/RealTimeNearStop/City/${city}/${routeName}?$top=1000&$format=JSON`
+      );
+      const busCurrentStop = PTX.get(
+        `/v2/Bus/RealTimeByFrequency/City/${city}/${routeName}?$top=1000&$format=JSON`
+      );
+
+      const data = await Promise.all([busPosition, busCurrentStop]);
+
+      dispatch({
+        type: REFETCH_NOW_BUS,
+        payload: {
+          busPosition: data[0].data,
+          busCurrentStop: data[1].data,
+        },
+      });
+    };
   },
 };
 
@@ -182,17 +210,13 @@ const mainSearchDataReducer = (preState = {}, action) => {
   return preState;
 };
 
-const targetBusDataOnClickReducer = (preState = [], action) => {
+const targetBusDataOnClickReducer = (preState = {}, action) => {
   if (action.type === TARGET_BUS_ONCLICK) {
-    return [...action.payload];
+    return { ...action.payload };
   }
 
-  return preState;
-};
-
-const selectRoadReducer = (preState = null, action) => {
-  if (action.type === SELECT_ROAD) {
-    return { ...action.payload };
+  if (action.type === REFETCH_NOW_BUS) {
+    return { ...preState, ...action.payload };
   }
 
   return preState;

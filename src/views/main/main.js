@@ -7,18 +7,20 @@ import "./main.scss";
 const renderMainSearchData = (data) => {
   if (data.searchBy === "route") {
     return Object.entries(data.data).map(([key, value]) => {
-      value = value.find((route) => route.Direction === 0);
+      let filterValue = value.find((route) => route.Direction === 0);
 
-      let startEnd = `${value.Stops[0].StopName.Zh_tw} <–> ${
-        value.Stops[value.Stops.length - 1].StopName.Zh_tw
+      let startEnd = `${filterValue.Stops[0].StopName.Zh_tw} <–> ${
+        filterValue.Stops[filterValue.Stops.length - 1].StopName.Zh_tw
       }`;
 
       return (
         <ListSmallCard
+          value={filterValue.RouteName.Zh_tw}
           searchBy={data.searchBy}
           key={key}
           title={key}
           startEnd={startEnd}
+          data={data}
         />
       );
     });
@@ -33,6 +35,7 @@ const renderMainSearchData = (data) => {
           key={key}
           title={key}
           secondData={value}
+          data={data}
         />
       );
     });

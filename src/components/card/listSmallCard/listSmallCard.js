@@ -5,18 +5,16 @@ import { map } from "../../leafletMap/leafletMap";
 
 import "./listSmallCard.scss";
 
-const listClickHandler = (props, dispatch, searchBy) => {
-  if (searchBy === "route") {
+const listClickHandler = (props, dispatch) => {
+  if (props.searchBy === "route") {
+    dispatch(
+      action.targetBusOnClickCreator(
+        props.value,
+        props.data.city,
+        props.data.data[props.title]
+      )
+    );
   }
-  map.setView(props.coords, 18);
-  // layer.openPopup(props.coords);
-  document
-    .querySelectorAll(".pin--restaurant")
-    .forEach((ele) => ele.classList.remove("icon--active"));
-  document
-    .querySelector(`.pin--restaurant--${props.id}`)
-    .classList.add("icon--active");
-  dispatch(action.selectRestaurantCreator(props.id));
 };
 
 const ListSmallCard = (props) => {
@@ -32,7 +30,7 @@ const ListSmallCard = (props) => {
       className={`listSmallCard`}
       data-id={`${props.StationID || `${props.routeUID}${props.direction}`}`}
       onClick={(e) => {
-        listClickHandler(props, dispatch, props.searchBy);
+        listClickHandler(props, dispatch);
       }}
     >
       <p className="listSmallCard__title">{props.title}</p>

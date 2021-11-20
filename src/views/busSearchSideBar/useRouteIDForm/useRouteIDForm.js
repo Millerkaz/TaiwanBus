@@ -6,6 +6,7 @@ import Btn from "../../../components/btn";
 import { action } from "../../../store";
 import { useDispatch, useSelector } from "react-redux";
 import CustomSelect from "../../../components/form/customSelect/customSelect";
+import Keyboard from "../../../components/keyboard/keyboard";
 
 import "./useRouteIDForm.scss";
 import { useEffect } from "react";
@@ -52,6 +53,7 @@ const UseRouteIDForm = (props) => {
       {/* <Btn color="" type="submit">
         搜尋
       </Btn> */}
+      <Keyboard />
     </form>
   );
 };
