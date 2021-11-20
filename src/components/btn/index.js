@@ -1,6 +1,18 @@
 import { Link } from "react-router-dom";
 import "./btn.scss";
 
+/**
+ *
+ * props:
+ * @type 按鈕種類 ("string" : "link ", "anchor" , "button"(default))
+ * @onClick click handler
+ * @color 按鈕樣式 ("string")
+ * @className ("string")
+ *
+ * *- button special-
+ * @value
+ */
+
 const Btn = (props) => {
   switch (props.type) {
     case "link":
@@ -34,6 +46,7 @@ const Btn = (props) => {
           className={`btn ${props.color && `btn--${props.color}`} ${
             props.className || ""
           }`}
+          value={props.value}
         >
           {props.children}
         </button>

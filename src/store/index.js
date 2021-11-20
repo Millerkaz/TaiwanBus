@@ -1,7 +1,7 @@
 import { PTX } from "../API";
 import { combineReducers } from "redux";
 import { reducer as formReducer } from "redux-form";
-import { dataFilterHelper2 } from "../helper";
+import { cityObj, dataFilterHelper } from "../helper";
 
 //*---------------- type ---------------- *//
 
@@ -26,9 +26,10 @@ const POP_HIDE = "POP_HIDE";
 //         : `$spatialFilter=nearby(${coords.lat}%2C${coords.lon}%2C10000)&$`;
 
 export const action = {
-  fetchDataByRouteCreator: ({ term, city }) => {
+  fetchDataByRouteCreator: ({ term, cityCH }) => {
     return async (dispatch) => {
       let response;
+      let city = cityObj[cityCH];
 
       //此五縣市戳 顯示用站序 API
       if (
@@ -47,7 +48,7 @@ export const action = {
         );
       }
 
-      let routeData = dataFilterHelper2(response.data, "RouteName");
+      let routeData = dataFilterHelper(response.data, "RouteName");
 
       // routeData = routeData.map((route) => {
       //   return {
@@ -71,9 +72,10 @@ export const action = {
     };
   },
 
-  fetchDataByStopNameCreator: ({ term, city }) => {
+  fetchDataByStopNameCreator: ({ term, cityCH }) => {
     return async (dispatch) => {
       let data;
+      let city = cityObj[cityCH];
 
       if (city === "Taipei" || city === "NewTaipei") {
         const taipeiData = PTX.get(
@@ -88,7 +90,7 @@ export const action = {
         // console.log(response);
 
         //過濾 StationID 重複的資料
-        data = dataFilterHelper2(response, "StopName");
+        data = dataFilterHelper(response, "StopName");
 
         // console.log(data);
       } else {
@@ -96,7 +98,7 @@ export const action = {
           `/v2/Bus/Stop/City/${city}?${`$filter=contains(StopName%2FZh_tw%2C'${term}')&`}$top=1000&$format=JSON`
         );
 
-        data = dataFilterHelper2(response.data, "StopName");
+        data = dataFilterHelper(response.data, "StopName");
       }
 
       // 連結 站牌名 + index ， 加快檢索速度
@@ -117,7 +119,7 @@ export const action = {
         `/v2/Bus/Station/NearBy?$top=10000&$spatialFilter=nearby(${lat}%2C${lng}%2C500)&$format=JSON`
       );
 
-      let data = dataFilterHelper2(response.data);
+      let data = dataFilterHelper(response.data);
       // console.log(data);
 
       dispatch({

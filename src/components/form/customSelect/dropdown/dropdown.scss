@@ -1,0 +1,33 @@
+.dropdown {
+  position: absolute;
+  top: 0;
+  left: 0%;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 30px;
+  z-index: 1000;
+
+  h1 {
+    margin: 1rem 0.5rem;
+  }
+
+  ul {
+    max-width: 40rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(6rem, 8rem));
+    grid-gap: 1rem;
+    padding: 2rem 0;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid grey;
+    }
+  }
+
+  li {
+    user-select: none;
+  }
+}
+
+.hidden--dropdown {
+  display: none;
+}

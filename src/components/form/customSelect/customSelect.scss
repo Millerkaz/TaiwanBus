@@ -1,0 +1,64 @@
+@import "../../../sass/variable.scss";
+
+.customSelect {
+  display: flex;
+  align-content: center;
+  flex-wrap: wrap;
+
+  &__dropContainer {
+    position: relative;
+    flex: 0 1 100%;
+    transform: translateX(1.2rem);
+    z-index: 10;
+  }
+
+  & > span {
+    flex: 0 1 100%;
+  }
+
+  &__value {
+    position: relative;
+    flex: 0 1 100%;
+
+    &:hover img {
+      animation: pulse-toDown 1s infinite;
+    }
+
+    p {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    img {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+  }
+
+  p {
+    flex: 0 1 100%;
+    background: #ffffff;
+    border: 1px solid #dcdee0;
+    box-sizing: border-box;
+    border-radius: 100px;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 1.6rem;
+    line-height: 2.3rem;
+    font-family: inherit;
+    box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.16);
+    padding: 1.4rem 2rem 1.5rem 2rem;
+    margin: 0rem 1.2rem;
+    // flex: 1;
+    // width: 100%;
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    @media only screen and (max-width: $rwd-medium) {
+      padding: 1rem;
+    }
+  }
+}

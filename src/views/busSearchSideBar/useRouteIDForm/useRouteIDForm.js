@@ -4,26 +4,76 @@ import Select from "../../../components/form/select/select";
 import Input from "../../../components/form/input/input";
 import Btn from "../../../components/btn";
 import { action } from "../../../store";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import CustomSelect from "../../../components/form/customSelect/customSelect";
 
 import "./useRouteIDForm.scss";
+import { useEffect } from "react";
+import { useRef } from "react";
 
 const UseRouteIDForm = (props) => {
+  const form = useSelector((state) => state.form.useRouteIDForm);
   const dispatch = useDispatch();
+  const timer = useRef(null);
 
   const formSubmitHandler = (valueObj) => {
     dispatch(action.fetchDataByRouteCreator(valueObj));
   };
 
+  useEffect(() => {
+    if (!form.values?.term) return;
+
+    timer.current = setTimeout(() => {
+      formSubmitHandler(form.values);
+    }, 1500);
+
+    return () => {
+      clearTimeout(timer.current);
+    };
+  }, [form.values?.term, form.values?.city]);
+
   return (
-    <form
-      className="useRouteIDForm"
-      onSubmit={props.handleSubmit((valueObj) => {
-        // console.log(valueObj);
-        formSubmitHandler(valueObj);
-      })}
-    >
+    <form className="useRouteIDForm">
       <Field
+        name="cityCH"
+        component={CustomSelect}
+        formName="useRouteIDForm"
+        label="請選擇城市："
+      ></Field>
+
+      <Field
+        name="term"
+        component={Input}
+        className={`useRouteIDForm__input`}
+        placeholder="請輸入公車號碼"
+        label="公車號碼："
+      />
+
+      {/* <Btn color="" type="submit">
+        搜尋
+      </Btn> */}
+    </form>
+  );
+};
+
+const validate = (formValues) => {
+  const error = {};
+
+  //   if (!formValues.term) {
+  //     error.term = "請輸入站點關鍵字";
+  //   }
+
+  return error;
+};
+
+export default reduxForm({
+  form: "useRouteIDForm",
+  initialValues: { cityCH: "臺北市" },
+  validate: validate,
+})(UseRouteIDForm);
+
+{
+  /* <Field
         name="city"
         component={Select}
         className={`useRouteIDForm__select`}
@@ -51,35 +101,5 @@ const UseRouteIDForm = (props) => {
         <option value="KinmenCounty">金門縣</option>
         <option value="PenghuCounty">澎湖縣</option>
         <option value="LienchiangCounty">連江縣</option>
-      </Field>
-
-      <Field
-        name="term"
-        component={Input}
-        className={`useRouteIDForm__input`}
-        placeholder="請輸入公車號碼"
-        label="公車號碼："
-      />
-
-      <Btn color="" type="submit">
-        搜尋
-      </Btn>
-    </form>
-  );
-};
-
-const validate = (formValues) => {
-  const error = {};
-
-  //   if (!formValues.term) {
-  //     error.term = "請輸入站點關鍵字";
-  //   }
-
-  return error;
-};
-
-export default reduxForm({
-  form: "useRouteIDForm",
-  initialValues: { city: "Taipei" },
-  validate: validate,
-})(UseRouteIDForm);
+      </Field> */
+}
