@@ -468,44 +468,87 @@ export const historyPush = (path) => {
   history.push(path);
 };
 
-export const dataFilterHelper = (dataNotFilter, filter) => {
-  // 篩掉重複的 stationID
-  let set = [...new Set(dataNotFilter.map((station) => station[filter]))];
+// export const dataFilterHelper = (dataNotFilter, filter) => {
+//   // 篩掉重複的 stationID
+//   let set = [...new Set(dataNotFilter.map((station) => station[filter]))];
 
-  console.log(set);
-  let dataArray = [];
-  let stopNameArray = [];
+//   console.log(set);
+//   let dataArray = [];
+//   let stopNameArray = [];
 
-  // console.log(set);
+//   // console.log(set);
 
-  // 每個 stationID 都有一組經過此站位的公車資料，儘管 StopName 相同，不同方向有自己的 stationID
-  // 將同 StopName ，但 stationID 不同的資料合併，的資料合併 [[{},{}],[{}],...]
+//   // 每個 stationID 都有一組經過此站位的公車資料，儘管 StopName 相同，不同方向有自己的 stationID
+//   // 將同 StopName ，但 stationID 不同的資料合併，的資料合併 [[{},{}],[{}],...]
 
-  if (filter === "StationID") {
-    set.forEach((id) => {
-      let eachData = dataNotFilter.find((station) => {
-        stopNameArray.push(station.StopName.Zh_tw);
-        return station[filter] === id;
-      });
+//   if (filter === "StationID") {
+//     set.forEach((id) => {
+//       let eachData = dataNotFilter.find((station) => {
+//         stopNameArray.push(station.StopName.Zh_tw);
+//         return station[filter] === id;
+//       });
 
-      dataArray.push(eachData);
-    });
+//       dataArray.push(eachData);
+//     });
 
-    console.log([...new Set(stopNameArray)]);
-    console.log(dataArray);
+//     console.log([...new Set(stopNameArray)]);
+//     console.log(dataArray);
 
-    stopNameArray = [...new Set(stopNameArray)].map((StopName) =>
-      dataArray.filter((eachData) => eachData.StopName.Zh_tw === StopName)
-    );
+//     stopNameArray = [...new Set(stopNameArray)].map((StopName) =>
+//       dataArray.filter((eachData) => eachData.StopName.Zh_tw === StopName)
+//     );
 
-    return stopNameArray;
-  }
+//     return stopNameArray;
+//   }
 
-  // 用公車號碼查尋只需整合同樣 routeUID 的資料
-  if (filter === "RouteUID") {
+//   // 用公車號碼查尋只需整合同樣 routeUID 的資料
+//   if (filter === "RouteUID") {
+//     // console.log(set);
+//     return set.map((id) => {
+//       return dataNotFilter.filter((eachData) => eachData.RouteUID === id);
+//     });
+//   }
+// };
+
+export const dataFilterHelper2 = (dataNotFilter, filter) => {
+  let dataObj = {};
+
+  if (filter === "StopName") {
+    //過濾重複站名
+    let set = [
+      ...new Set(dataNotFilter.map((station) => station.StopName.Zh_tw)),
+    ];
+
     // console.log(set);
-    return set.map((id) => {
-      return dataNotFilter.filter((eachData) => eachData.RouteUID === id);
+
+    //以站名為key創建obj
+    set.forEach((name) => {
+      dataObj[name] = [];
+    });
+
+    //過濾資料 : 將符合站名且 StationID 沒重複的資料加入
+    dataNotFilter.forEach((obj) => {
+      if (
+        dataObj[obj.StopName.Zh_tw].some(
+          (filtered) => filtered.StationID === obj.StationID
+        )
+      )
+        return;
+
+      dataObj[obj.StopName.Zh_tw].push(obj);
     });
   }
+
+  if (filter === "RouteName") {
+    let set = [...new Set(dataNotFilter.map((route) => route.RouteName.Zh_tw))];
+
+    set.forEach((name) => {
+      dataObj[name] = [];
+    });
+
+    dataNotFilter.forEach((obj) => {
+      dataObj[obj.RouteName.Zh_tw].push(obj);
+    });
+  }
+  return dataObj;
 };

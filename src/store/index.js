@@ -1,7 +1,7 @@
 import { PTX } from "../API";
 import { combineReducers } from "redux";
 import { reducer as formReducer } from "redux-form";
-import { dataFilterHelper } from "../helper";
+import { dataFilterHelper2 } from "../helper";
 
 //*---------------- type ---------------- *//
 
@@ -47,19 +47,19 @@ export const action = {
         );
       }
 
-      let routeData = dataFilterHelper(response.data, "RouteUID");
+      let routeData = dataFilterHelper2(response.data, "RouteName");
 
-      routeData = routeData.map((route) => {
-        return {
-          routeUID: route[0].RouteUID,
-          routeName: route[0].RouteName.Zh_tw,
-          direction: route[0].Direction,
-          stops: route[0].Stops,
-          startEnd: `${route[0].Stops[0].StopName.Zh_tw} <–> ${
-            route[0].Stops[route[0].Stops.length - 1].StopName.Zh_tw
-          }`,
-        };
-      });
+      // routeData = routeData.map((route) => {
+      //   return {
+      //     routeUID: route[0].RouteUID,
+      //     routeName: route[0].RouteName.Zh_tw,
+      //     direction: route[0].Direction,
+      //     stops: route[0].Stops,
+      //     startEnd: `${route[0].Stops[0].StopName.Zh_tw} <–> ${
+      //       route[0].Stops[route[0].Stops.length - 1].StopName.Zh_tw
+      //     }`,
+      //   };
+      // });
 
       dispatch({
         type: FETCH_DATA,
@@ -88,7 +88,7 @@ export const action = {
         // console.log(response);
 
         //過濾 StationID 重複的資料
-        data = dataFilterHelper(response, "StationID");
+        data = dataFilterHelper2(response, "StopName");
 
         // console.log(data);
       } else {
@@ -96,7 +96,7 @@ export const action = {
           `/v2/Bus/Stop/City/${city}?${`$filter=contains(StopName%2FZh_tw%2C'${term}')&`}$top=1000&$format=JSON`
         );
 
-        data = dataFilterHelper(response.data, "StationID");
+        data = dataFilterHelper2(response.data, "StopName");
       }
 
       // 連結 站牌名 + index ， 加快檢索速度
@@ -117,8 +117,8 @@ export const action = {
         `/v2/Bus/Station/NearBy?$top=10000&$spatialFilter=nearby(${lat}%2C${lng}%2C500)&$format=JSON`
       );
 
-      let data = dataFilterHelper(response.data);
-      console.log(data);
+      let data = dataFilterHelper2(response.data);
+      // console.log(data);
 
       dispatch({
         type: FETCH_DATA,

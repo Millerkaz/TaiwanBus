@@ -35,9 +35,7 @@ const ListSmallCard = (props) => {
         listClickHandler(props, dispatch, props.searchBy);
       }}
     >
-      <p className="listSmallCard__title">
-        {props.routeName || props.StopName?.Zh_tw}
-      </p>
+      <p className="listSmallCard__title">{props.title}</p>
       {/* <p className="listSmallCard__address">{props.address}</p> */}
       {/* <p className="listSmallCard__open">{props.open}</p> */}
       {props.startEnd && (

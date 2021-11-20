@@ -6,30 +6,33 @@ import "./main.scss";
 
 const renderMainSearchData = (data) => {
   if (data.searchBy === "route") {
-    return data.data.map((eachRoute, index) => (
-      <ListSmallCard
-        searchBy={data.searchBy}
-        key={`${eachRoute.routeUID}${eachRoute.direction}`}
-        index={index}
-        {...eachRoute}
-      />
-    ));
-  }
+    return Object.entries(data.data).map(([key, value]) => {
+      value = value.find((route) => route.Direction === 0);
 
-  if (data.searchBy === "stop") {
-    console.log(data.data);
-    return data.data.map((eachRoute, index) => {
-      if (eachRoute.length === 0) {
-        return;
-      }
+      let startEnd = `${value.Stops[0].StopName.Zh_tw} <–> ${
+        value.Stops[value.Stops.length - 1].StopName.Zh_tw
+      }`;
 
       return (
         <ListSmallCard
           searchBy={data.searchBy}
-          key={`${eachRoute[0].StationID}`}
-          index={index}
-          secondData={eachRoute}
-          {...eachRoute[0]}
+          key={key}
+          title={key}
+          startEnd={startEnd}
+        />
+      );
+    });
+  }
+
+  if (data.searchBy === "stop") {
+    // console.log(Object.entries(data.data));
+    return Object.entries(data.data).map(([key, value]) => {
+      return (
+        <ListSmallCard
+          searchBy={data.searchBy}
+          key={key}
+          title={key}
+          secondData={value}
         />
       );
     });
