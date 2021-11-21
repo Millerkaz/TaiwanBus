@@ -1,0 +1,45 @@
+.busSearchList {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-height: 70vh;
+  overflow: auto;
+
+  &__first {
+    margin-top: 10rem;
+
+    img {
+      width: 40rem;
+      width: 20rem;
+    }
+    p {
+      color: #bcc1d1;
+      font-family: "Noto Sans TC";
+      font-size: 1.6rem;
+      line-height: 2.3rem;
+      margin-top: 1.9rem;
+      text-align: center;
+    }
+  }
+
+  &__no {
+    margin-top: 10rem;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+
+    img {
+      width: 15rem;
+      width: 10rem;
+    }
+    p {
+      color: #bcc1d1;
+      font-family: "Noto Sans TC";
+      font-size: 1.6rem;
+      line-height: 2.3rem;
+      margin-top: 1.9rem;
+      text-align: center;
+    }
+  }
+}

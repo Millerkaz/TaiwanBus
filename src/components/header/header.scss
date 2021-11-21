@@ -1,0 +1,16 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 0;
+
+  &__menu {
+    color: white;
+    cursor: pointer;
+  }
+
+  &__logo {
+    width: 12.4rem;
+    height: 4.2rem;
+    cursor: pointer;
+  }
+}

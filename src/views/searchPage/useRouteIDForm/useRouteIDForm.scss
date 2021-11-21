@@ -1,0 +1,18 @@
+.useRouteIDForm {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+  & > div {
+    flex: 0 1 100%;
+  }
+
+  &__select {
+  }
+
+  &__input {
+    input {
+      padding: 1rem;
+      height: 4rem;
+    }
+  }
+}

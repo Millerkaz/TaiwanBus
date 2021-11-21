@@ -52,10 +52,7 @@ body {
 }
 
 #root {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1000000;
+  position: relative;
 }
 
 .img--hidden {

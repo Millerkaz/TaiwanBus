@@ -2,12 +2,15 @@ import React, { useState, useEffect, useCallback } from "react";
 import { change } from "redux-form";
 import { useDispatch } from "react-redux";
 import Btn from "../btn";
+import img from "../../img";
 import "./keyboard.scss";
 
 const btnClickHandler = (e) => {};
 
 const Keyboard = (props) => {
   const [value, setValue] = useState([]);
+  const [hideKeyboard, setHideKeyboard] = useState(false);
+  const dispatch = useDispatch();
 
   const btnClickHandler = (e) => {
     setValue((pre) => {
@@ -16,12 +19,25 @@ const Keyboard = (props) => {
   };
 
   useEffect(() => {
+    dispatch(change("useRouteIDForm", "term", value.join("")));
     console.log(value.join(""));
   }, [value]);
 
   return (
-    <div className="keyboard">
-      <ul>
+    <div className={`keyboard`}>
+      <div
+        className={`keyboard__arrow`}
+        onClick={() => {
+          setHideKeyboard((pre) => !pre);
+        }}
+      >
+        <img
+          className={`${hideKeyboard ? "rotate" : ""}`}
+          src={img.i_arrowD}
+          alt="arrow"
+        />
+      </div>
+      <ul className={`${hideKeyboard ? "hidden--keyboard" : ""}`}>
         <li className="btn btn--keyboard" onClick={btnClickHandler}>
           紅
         </li>

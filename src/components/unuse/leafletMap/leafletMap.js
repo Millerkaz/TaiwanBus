@@ -127,7 +127,6 @@ const mergeBikeData = (bikeDataFromState) => {
       },
       name: {
         tw: bikeDataFromState.bikeData[i].StationName.Zh_tw.split("_"),
-        en: bikeDataFromState.bikeData[i].StationName.En.split("_"),
       },
       address: bikeDataFromState.bikeData[i].StationAddress,
     };

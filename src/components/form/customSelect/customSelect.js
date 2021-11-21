@@ -22,7 +22,7 @@ const CustomDropDown = (props) => {
   }, [value]);
 
   return (
-    <div className="customSelect">
+    <div className={`customSelect ${props.className || ""}`}>
       <span>{props.label}</span>
       <div className="customSelect__value">
         <p

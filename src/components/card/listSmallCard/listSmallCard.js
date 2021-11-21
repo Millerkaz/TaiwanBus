@@ -1,15 +1,19 @@
 import React from "react";
 import { action } from "../../../store";
 import { useDispatch, useSelector } from "react-redux";
+import { historyPush } from "../../../helper";
 import { map } from "../../leafletMap/leafletMap";
+import img from "../../../img";
 
 import "./listSmallCard.scss";
 
 const listClickHandler = (props, dispatch) => {
   if (props.searchBy === "route") {
+    historyPush(`/busMap/${props.data.city}/${props.routeName}`);
     dispatch(
       action.targetBusOnClickCreator(
-        props.value,
+        props.routeName,
+        props.routeUID,
         props.data.city,
         props.data.data[props.title]
       )
@@ -33,14 +37,19 @@ const ListSmallCard = (props) => {
         listClickHandler(props, dispatch);
       }}
     >
-      <p className="listSmallCard__title">{props.title}</p>
-      {/* <p className="listSmallCard__address">{props.address}</p> */}
-      {/* <p className="listSmallCard__open">{props.open}</p> */}
-      {props.startEnd && (
-        <a className="listSmallCard__subTitle">{props.startEnd}</a>
-      )}
+      <div>
+        <p className="listSmallCard__title">{props.title}</p>
+        {props.startEnd && (
+          <p className="listSmallCard__subTitle">{props.startEnd}</p>
+        )}
+      </div>
 
-      {props.secondData && (
+      <div className="listSmallCard__favor">
+        <img src={img.i_heartLine} />
+        <p>{props.data.city}</p>
+      </div>
+
+      {/* {props.secondData && (
         <div className={`listSmallCard__subList hidden--subList`}>
           {props.secondData.map((each) => (
             <div>
@@ -49,7 +58,7 @@ const ListSmallCard = (props) => {
             </div>
           ))}
         </div>
-      )}
+      )} */}
     </div>
   );
 };

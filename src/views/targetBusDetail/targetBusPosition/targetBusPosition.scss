@@ -1,0 +1,36 @@
+.targetBusPosition {
+  display: flex;
+  &__bus {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+
+    li {
+      display: flex;
+      align-self: center;
+      height: 5rem;
+
+      span {
+        margin: 0 0.5rem;
+        align-self: center;
+      }
+    }
+  }
+
+  &__estimateTime {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+
+    li {
+      display: flex;
+      align-self: center;
+      height: 5rem;
+
+      span {
+        margin: 0 0.5rem;
+        align-self: center;
+      }
+    }
+  }
+}

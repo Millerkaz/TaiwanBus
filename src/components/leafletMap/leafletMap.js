@@ -365,7 +365,7 @@ const LeafletMap = (props) => {
   //   map.flyToBounds(road.current.getBounds());
   // }, [selectRoad]);
 
-  return <></>;
+  return <div id="map" class="map"></div>;
 };
 
 export default LeafletMap;

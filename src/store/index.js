@@ -3,6 +3,53 @@ import { combineReducers } from "redux";
 import { reducer as formReducer } from "redux-form";
 import { cityObj, dataFilterHelper } from "../helper";
 
+function stopBusSortHelper(
+  stopsArray,
+  busCurrentStop,
+  estimateTime,
+  Direction
+) {
+  const stops = {};
+  let stopDirectionArray = stopsArray[Direction]?.Stops;
+
+  console.log(stopsArray[Direction]);
+  console.log(stopsArray);
+
+  // 新竹縣 62
+  if (!stopDirectionArray) {
+    stopDirectionArray = stopsArray[0].Stops;
+  }
+
+  if (
+    stopDirectionArray[0].StopName.Zh_tw ===
+      stopDirectionArray[stopDirectionArray.length - 1].StopName.Zh_tw &&
+    stopDirectionArray[0].StopBoarding === 1 &&
+    stopDirectionArray[stopDirectionArray.length - 1].StopBoarding === -1
+  ) {
+    stopDirectionArray[0].StopName.Zh_tw =
+      stopDirectionArray[0].StopName.Zh_tw + "(起點)";
+    stopDirectionArray[stopDirectionArray.length - 1].StopName.Zh_tw =
+      stopDirectionArray[stopDirectionArray.length - 1].StopName.Zh_tw +
+      "(終點)";
+  }
+
+  stopDirectionArray.forEach((v, i) => {
+    stops[v.StopName.Zh_tw + `(${i + 1})`] = [
+      busCurrentStop.filter(
+        (busObj) =>
+          busObj.StopUID === v.StopUID && busObj.Direction === Direction
+      ),
+      estimateTime.filter(
+        (stopObj) =>
+          stopObj.StopUID === v.StopUID && stopObj.Direction === Direction
+      ),
+    ];
+  });
+
+  console.log(stops);
+  return [Object.keys(stops), Object.values(stops)];
+}
+
 //*---------------- type ---------------- *//
 
 const FETCH_DATA = "FETCH_DATA";
@@ -146,30 +193,71 @@ export const action = {
 
   ///////////////////////////////////////////////////////////
 
-  targetBusOnClickCreator: (routeName, city, stopsArray) => {
+  targetBusOnClickCreator: (routeName, routeUID, city, stopsArray) => {
     return async (dispatch) => {
-      const busPosition = PTX.get(
-        `/v2/Bus/RealTimeNearStop/City/${city}/${routeName}?$top=1000&$format=JSON`
+      // const busPosition = PTX.get(
+      //   `/v2/Bus/RealTimeNearStop/City/${city}/${routeName}?$top=1000&$format=JSON`
+      // );
+      // const busCurrentStop = PTX.get(
+      //   `/v2/Bus/RealTimeByFrequency/City/${city}/${routeName}?$top=1000&$format=JSON`
+      // );
+      // const routeShape = PTX.get(
+      //   `/v2/Bus/Shape/City/${city}?$filter=RouteName%2FZh_tw%20eq%20'${routeName}'&$top=1000&$format=JSON`
+      // );
+
+      // const estimateTime = PTX.get(
+      //   `/v2/Bus/EstimatedTimeOfArrival/City/${city}?$filter=contains(RouteName%20%2FZh_tw%2C'${routeName}')&$top=5000&$format=JSON`
+      // );
+
+      let busCurrentStop = PTX.get(
+        `/v2/Bus/RealTimeNearStop/City/${city}?$filter=contains(RouteUID%2C'${routeUID}')&$top=5000&$format=JSON`
       );
-      const busCurrentStop = PTX.get(
-        `/v2/Bus/RealTimeByFrequency/City/${city}/${routeName}?$top=1000&$format=JSON`
+      const busPosition = PTX.get(
+        `/v2/Bus/RealTimeByFrequency/City/${city}?$filter=contains(RouteUID%2C'${routeUID}')&$top=5000&$format=JSON`
       );
       const routeShape = PTX.get(
-        `/v2/Bus/Shape/City/${city}?$filter=RouteName%2FZh_tw%20eq%20'${routeName}'&$top=1000&$format=JSON`
+        `/v2/Bus/Shape/City/${city}?$filter=contains(RouteUID%2C'${routeUID}')&$top=5000&$format=JSON`
       );
 
-      const data = await Promise.all([busPosition, busCurrentStop, routeShape]);
+      let estimateTime = PTX.get(
+        `/v2/Bus/EstimatedTimeOfArrival/City/${city}?$filter=contains(RouteUID%2C'${routeUID}')&$top=5000&$format=JSON`
+      );
 
-      console.log(data);
+      const data = await Promise.all([
+        busCurrentStop,
+        busPosition,
+        routeShape,
+        estimateTime,
+      ]);
+
+      busCurrentStop = data[0].data;
+      estimateTime = data[3].data;
+
+      const [routeDirection0Name, routeDirection0Bus] = stopBusSortHelper(
+        stopsArray,
+        busCurrentStop,
+        estimateTime,
+        0
+      );
+
+      const [routeDirection1Name, routeDirection1Bus] = stopBusSortHelper(
+        stopsArray,
+        busCurrentStop,
+        estimateTime,
+        1
+      );
 
       dispatch({
         type: TARGET_BUS_ONCLICK,
         payload: {
-          target: { routeName, city },
-          busPosition: data[0].data,
-          busCurrentStop: data[1].data,
+          target: { routeName, routeUID, city },
+          busCurrentStop,
+          busPosition: data[1].data,
           routeShape: data[2].data,
+          estimateTime,
           routeStops: stopsArray,
+          routeDirection0Bus,
+          routeDirection1Bus,
         },
       });
     };
@@ -184,13 +272,22 @@ export const action = {
         `/v2/Bus/RealTimeByFrequency/City/${city}/${routeName}?$top=1000&$format=JSON`
       );
 
-      const data = await Promise.all([busPosition, busCurrentStop]);
+      const estimateTime = PTX.get(
+        `/v2/Bus/EstimatedTimeOfArrival/City/${city}?$filter=contains(RouteName%20%2FZh_tw%2C'${routeName}')&$top=5000&$format=JSON`
+      );
+
+      const data = await Promise.all([
+        busPosition,
+        busCurrentStop,
+        estimateTime,
+      ]);
 
       dispatch({
         type: REFETCH_NOW_BUS,
         payload: {
           busPosition: data[0].data,
           busCurrentStop: data[1].data,
+          estimateTime: data[2].data,
         },
       });
     };
