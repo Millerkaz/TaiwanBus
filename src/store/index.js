@@ -1,61 +1,16 @@
 import { PTX } from "../API";
 import { combineReducers } from "redux";
 import { reducer as formReducer } from "redux-form";
-import { cityObj, dataFilterHelper } from "../helper";
-
-function stopBusSortHelper(
-  stopsArray,
-  busCurrentStop,
-  estimateTime,
-  Direction
-) {
-  const stops = {};
-  let stopDirectionArray = stopsArray[Direction]?.Stops;
-
-  console.log(stopsArray[Direction]);
-  console.log(stopsArray);
-
-  // 新竹縣 62
-  if (!stopDirectionArray) {
-    stopDirectionArray = stopsArray[0].Stops;
-  }
-
-  if (
-    stopDirectionArray[0].StopName.Zh_tw ===
-      stopDirectionArray[stopDirectionArray.length - 1].StopName.Zh_tw &&
-    stopDirectionArray[0].StopBoarding === 1 &&
-    stopDirectionArray[stopDirectionArray.length - 1].StopBoarding === -1
-  ) {
-    stopDirectionArray[0].StopName.Zh_tw =
-      stopDirectionArray[0].StopName.Zh_tw + "(起點)";
-    stopDirectionArray[stopDirectionArray.length - 1].StopName.Zh_tw =
-      stopDirectionArray[stopDirectionArray.length - 1].StopName.Zh_tw +
-      "(終點)";
-  }
-
-  stopDirectionArray.forEach((v, i) => {
-    stops[v.StopName.Zh_tw + `(${i + 1})`] = [
-      busCurrentStop.filter(
-        (busObj) =>
-          busObj.StopUID === v.StopUID && busObj.Direction === Direction
-      ),
-      estimateTime.filter(
-        (stopObj) =>
-          stopObj.StopUID === v.StopUID && stopObj.Direction === Direction
-      ),
-    ];
-  });
-
-  console.log(stops);
-  return [Object.keys(stops), Object.values(stops)];
-}
+import { cityObj, dataFilterHelper, stopBusSortHelper } from "../helper";
 
 //*---------------- type ---------------- *//
 
 const FETCH_DATA = "FETCH_DATA";
 const REFETCH_NOW_BUS = "REFETCH_NOW_BUS";
 const TARGET_BUS_ONCLICK = "TARGET_BUS_ONCLICK";
-const CLEAR_NEAR_DATA = "CLEAR_NEAR_DATA";
+
+const CHANGE_DIRECTION = "CHANGE_DIRECTION";
+const CHANGE_DIRECTION_FORCE_0 = "CHANGE_DIRECTION_FORCE_0";
 
 const SELECT_ROAD = "SELECT_ROAD";
 
@@ -75,6 +30,10 @@ export const action = {
       let response;
       let city = cityObj[cityCH];
 
+      if (!city) {
+        city = cityCH;
+      }
+
       //此五縣市戳 顯示用站序 API
       if (
         city === "Taipei" ||
@@ -93,18 +52,6 @@ export const action = {
       }
 
       let routeData = dataFilterHelper(response.data, "RouteName");
-
-      // routeData = routeData.map((route) => {
-      //   return {
-      //     routeUID: route[0].RouteUID,
-      //     routeName: route[0].RouteName.Zh_tw,
-      //     direction: route[0].Direction,
-      //     stops: route[0].Stops,
-      //     startEnd: `${route[0].Stops[0].StopName.Zh_tw} <–> ${
-      //       route[0].Stops[route[0].Stops.length - 1].StopName.Zh_tw
-      //     }`,
-      //   };
-      // });
 
       dispatch({
         type: FETCH_DATA,
@@ -195,24 +142,10 @@ export const action = {
 
   targetBusOnClickCreator: (routeName, routeUID, city, stopsArray) => {
     return async (dispatch) => {
-      // const busPosition = PTX.get(
-      //   `/v2/Bus/RealTimeNearStop/City/${city}/${routeName}?$top=1000&$format=JSON`
-      // );
-      // const busCurrentStop = PTX.get(
-      //   `/v2/Bus/RealTimeByFrequency/City/${city}/${routeName}?$top=1000&$format=JSON`
-      // );
-      // const routeShape = PTX.get(
-      //   `/v2/Bus/Shape/City/${city}?$filter=RouteName%2FZh_tw%20eq%20'${routeName}'&$top=1000&$format=JSON`
-      // );
-
-      // const estimateTime = PTX.get(
-      //   `/v2/Bus/EstimatedTimeOfArrival/City/${city}?$filter=contains(RouteName%20%2FZh_tw%2C'${routeName}')&$top=5000&$format=JSON`
-      // );
-
       let busCurrentStop = PTX.get(
         `/v2/Bus/RealTimeNearStop/City/${city}?$filter=contains(RouteUID%2C'${routeUID}')&$top=5000&$format=JSON`
       );
-      const busPosition = PTX.get(
+      let busPosition = PTX.get(
         `/v2/Bus/RealTimeByFrequency/City/${city}?$filter=contains(RouteUID%2C'${routeUID}')&$top=5000&$format=JSON`
       );
       const routeShape = PTX.get(
@@ -231,7 +164,22 @@ export const action = {
       ]);
 
       busCurrentStop = data[0].data;
+      busPosition = data[1].data;
       estimateTime = data[3].data;
+
+      const busTypePromises = busPosition.map((bus) => {
+        return PTX.get(
+          `/v2/Bus/Vehicle/City/${city}?$filter=contains(PlateNumb%2C'${bus.PlateNumb}')&$top=20&$format=JSON`
+        );
+      });
+
+      let busTypeObj = {};
+      let busType = await Promise.all(busTypePromises);
+      busType.forEach((bus) => {
+        if (bus.data.length === 0) return;
+        busTypeObj[bus.data[0]?.PlateNumb] = bus.data[0]?.VehicleType;
+      });
+      console.log(busTypeObj);
 
       const [routeDirection0Name, routeDirection0Bus] = stopBusSortHelper(
         stopsArray,
@@ -252,18 +200,19 @@ export const action = {
         payload: {
           target: { routeName, routeUID, city },
           busCurrentStop,
-          busPosition: data[1].data,
+          busPosition,
           routeShape: data[2].data,
           estimateTime,
           routeStops: stopsArray,
           routeDirection0Bus,
           routeDirection1Bus,
+          busTypeObj,
         },
       });
     };
   },
 
-  reFetchNowBus: (routeName, city) => {
+  reFetchNowBusCreator: (routeName, city) => {
     return async (dispatch) => {
       const busPosition = PTX.get(
         `/v2/Bus/RealTimeNearStop/City/${city}/${routeName}?$top=1000&$format=JSON`
@@ -291,6 +240,14 @@ export const action = {
         },
       });
     };
+  },
+
+  changeDirectionCreator: (force = false) => {
+    if (!force) {
+      return { type: CHANGE_DIRECTION };
+    }
+
+    return { type: CHANGE_DIRECTION_FORCE_0 };
   },
 };
 
@@ -332,15 +289,33 @@ const popWindowReducer = (preState = {}, action) => {
   }
 };
 
+const changeDirectionReducer = (preState = "0", action) => {
+  if (action.type === CHANGE_DIRECTION) {
+    if (preState === "0") {
+      return "1";
+    }
+
+    if (preState === "1") {
+      return "0";
+    }
+  }
+
+  if (action.type === CHANGE_DIRECTION_FORCE_0) {
+    return "0";
+  }
+
+  return preState;
+};
+
 export const reducers = combineReducers({
   //維持資料一致性， data為 [ [ {...},{...} ] , [ {...} ] ,...] ，顯示時站牌時抓每一項[0]的 StopName.Zh_tw
   mainSearchData: mainSearchDataReducer,
 
   targetBusRenderData: targetBusDataOnClickReducer,
 
-  // choseBusPopupData: selectRoadReducer,
-
   popWindow: popWindowReducer,
+
+  routeDirection: changeDirectionReducer,
 
   form: formReducer,
 });

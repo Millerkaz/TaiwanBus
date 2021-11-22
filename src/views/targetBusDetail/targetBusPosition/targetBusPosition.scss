@@ -1,36 +1,21 @@
 .targetBusPosition {
-  display: flex;
-  &__bus {
+  flex: 1;
+  li {
     display: flex;
     flex-flow: column;
     justify-content: center;
+    align-items: flex-end;
+    height: 5rem;
 
-    li {
-      display: flex;
+    span {
+      margin: 0 0.5rem;
       align-self: center;
-      height: 5rem;
-
-      span {
-        margin: 0 0.5rem;
-        align-self: center;
-      }
-    }
-  }
-
-  &__estimateTime {
-    display: flex;
-    flex-flow: column;
-    justify-content: center;
-
-    li {
-      display: flex;
-      align-self: center;
-      height: 5rem;
-
-      span {
-        margin: 0 0.5rem;
-        align-self: center;
-      }
+      color: #5cbcdb;
+      border: 1px solid #5cbcdb;
+      box-sizing: border-box;
+      border-radius: 100px;
+      padding: 3px;
+      font-size: 1.2rem;
     }
   }
 }

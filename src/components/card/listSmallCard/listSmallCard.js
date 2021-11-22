@@ -7,20 +7,6 @@ import img from "../../../img";
 
 import "./listSmallCard.scss";
 
-const listClickHandler = (props, dispatch) => {
-  if (props.searchBy === "route") {
-    historyPush(`/busMap/${props.data.city}/${props.routeName}`);
-    dispatch(
-      action.targetBusOnClickCreator(
-        props.routeName,
-        props.routeUID,
-        props.data.city,
-        props.data.data[props.title]
-      )
-    );
-  }
-};
-
 const ListSmallCard = (props) => {
   const dispatch = useDispatch();
   // const selectRestaurant = useSelector((state) => state.selectRestaurant);
@@ -34,13 +20,17 @@ const ListSmallCard = (props) => {
       className={`listSmallCard`}
       data-id={`${props.StationID || `${props.routeUID}${props.direction}`}`}
       onClick={(e) => {
-        listClickHandler(props, dispatch);
+        historyPush(`/busMap/${props.data.city}/${props.routeName}`);
       }}
     >
       <div>
         <p className="listSmallCard__title">{props.title}</p>
         {props.startEnd && (
-          <p className="listSmallCard__subTitle">{props.startEnd}</p>
+          <p className="listSmallCard__subTitle">
+            {props.start}
+            <img src={img.i_arrowsAltB} />
+            {props.end}
+          </p>
         )}
       </div>
 

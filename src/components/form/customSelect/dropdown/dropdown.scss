@@ -17,6 +17,7 @@
     grid-template-columns: repeat(auto-fit, minmax(6rem, 8rem));
     grid-gap: 1rem;
     padding: 2rem 0;
+    justify-content: center;
 
     &:not(:last-child) {
       border-bottom: 1px solid grey;

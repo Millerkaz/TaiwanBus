@@ -38,6 +38,9 @@
     color: #f66a4b;
     margin-bottom: 0.2rem;
     flex: 0 1 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     // text-align: center;
     font-weight: 400;
@@ -53,6 +56,18 @@
     font-size: 1.2rem;
     line-height: 1.7rem;
     color: #4c546a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    display: flex;
+    align-items: center;
+
+    img {
+      margin: 0 0.5rem;
+      width: 1.2rem;
+      height: 0.5rem;
+    }
   }
 
   &:hover {

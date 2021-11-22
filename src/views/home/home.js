@@ -19,27 +19,27 @@ const Home = (props) => {
               historyPush("/searchBus");
             }}
           >
-            <div>
+            <div class="btn btn--icon">
               <img src={img.i_busW} alt="bus" />
             </div>
             <p>公車動態</p>
           </li>
           <li>
-            <div>
+            <div class="btn btn--icon">
               <img src={img.i_locate} alt="locate" />
             </div>
 
             <p>附近站點</p>
           </li>
           <li>
-            <div>
+            <div class="btn btn--icon">
               <img src={img.i_time} alt="time" />
             </div>
 
             <p>班表查詢</p>
           </li>
           <li>
-            <div>
+            <div class="btn btn--icon">
               <img src={img.i_heartW} alt="favor" />
             </div>
 

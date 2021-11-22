@@ -15,6 +15,11 @@ const renderMainSearchData = (data) => {
         filterValue.Stops[filterValue.Stops.length - 1].StopName.Zh_tw
       }`;
 
+      let start = `${filterValue.Stops[0].StopName.Zh_tw} `;
+      let end = ` ${
+        filterValue.Stops[filterValue.Stops.length - 1].StopName.Zh_tw
+      }`;
+
       return (
         <ListSmallCard
           routeName={filterValue.RouteName.Zh_tw}
@@ -23,6 +28,8 @@ const renderMainSearchData = (data) => {
           key={key}
           title={key}
           startEnd={startEnd}
+          start={start}
+          end={end}
           data={data}
         />
       );

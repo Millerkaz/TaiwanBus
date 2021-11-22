@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-// import myself_img from "../../img/icons/Mine.png";
+import Wkt from "wicket";
+
 import { PTX } from "../../API";
 import { useDispatch, useSelector } from "react-redux";
 import { action } from "../../store";
+import img from "../../img";
 
+import Header from "../header/header";
 import Btn from "../btn";
 // import img from "../../img";
 import "./leafletMap.scss";
@@ -12,6 +15,8 @@ import "./icon.scss";
 export let map;
 export let myself = null;
 export let myselfPosition;
+
+const wkt = new Wkt.Wkt();
 
 const searchZoom = 10;
 const pinZoom = 17;
@@ -145,16 +150,19 @@ const mapBuild = () => {
 /////////////////////////////////////////////////////////////////////////////////////////
 
 const LeafletMap = (props) => {
-  const selectRoad = useSelector((state) => state.selectRoad);
-  const bikeData = useSelector((state) => state.bikeData);
-  const nearRestaurantData = useSelector((state) => state.nearRestaurantData);
-  const nearBikeData = useSelector((state) => state.nearBikeData);
-  const dispatch = useDispatch();
+  const [hideStop, setHideStop] = useState(false);
 
-  const nearBikeMarksGroup = useRef(null);
-  const nearShopsGroup = useRef(null);
+  const target = useSelector((state) => state.targetBusRenderData.target);
+  const shape = useSelector((state) => state.targetBusRenderData?.routeShape);
+  const routeDirection = useSelector((state) => state.routeDirection);
+  const routeStops = useSelector(
+    (state) => state.targetBusRenderData.routeStops
+  );
+
+  const busLine = useRef(null);
+  const positionPointGroup = useRef(null);
+  const positionLayer = useRef(null);
   const searchBikeMarksGroup = useRef(null);
-  const road = useRef(null);
 
   useEffect(() => {
     mapBuild();
@@ -184,188 +192,123 @@ const LeafletMap = (props) => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   if (nearBikeMarksGroup.current) {
-  //     map.removeLayer(nearBikeMarksGroup.current);
-  //   }
-  //   if (!nearBikeData?.bikeData) {
-  //     // console.log("附近1公里內無站點");
-  //     return;
-  //   }
-  //   if (
-  //     nearBikeData.bikeData.length !== nearBikeData.bikeAvailableData.length
-  //   ) {
-  //     // console.log("附近站點資料數量無法匹配");
-  //     return;
-  //   }
+  useEffect(() => {
+    if (!shape) {
+      return;
+    }
 
-  //   const bikeStationArray = mergeBikeData(nearBikeData);
+    if (busLine.current) {
+      map.removeLayer(busLine.current);
+    }
 
-  //   const bikeMarks = bikeStationArray.map((station) => {
-  //     return window.L.marker(station.coords, {
-  //       icon: window.L.divIcon({
-  //         className: "pin--bike",
-  //         html: `
-  //         <div style="background-image: linear-gradient(180deg, white ${
-  //           100 -
-  //           (station.canRentBikes /
-  //             (station.canRentBikes + station.needReturnBikes)) *
-  //             100
-  //         }%, #d9ef08 ${
-  //           (station.canRentBikes /
-  //             (station.canRentBikes + station.needReturnBikes)) *
-  //           100
-  //         }%);">
-  //           <img src=${img.i_bike}></img>
-  //         </div>
-  //           `,
-  //       }),
-  //     })
-  //       .bindPopup(renderStationDetail(station, dispatch))
-  //       .on("click", (e) => {
-  //         map.setView(e.latlng, pinZoom);
-  //       });
-  //   });
+    wkt.read(shape[0].Geometry);
+    // console.log(wkt.toJson());
 
-  //   map.setView(myselfPosition, 16);
-  //   nearBikeMarksGroup.current = window.L.layerGroup(bikeMarks);
-  //   map.addLayer(nearBikeMarksGroup.current);
-  // }, [nearBikeData]);
+    if (routeDirection === "0") {
+      busLine.current = window.L.geoJSON(wkt.toJson(), {
+        style: function () {
+          return {
+            color: "#5D9FFF",
+          };
+        },
+      }).addTo(map);
+    }
 
-  // useEffect(() => {
-  //   if (nearShopsGroup.current) {
-  //     map.removeLayer(nearShopsGroup.current);
-  //   }
-  //   if (nearRestaurantData === null) {
-  //     return;
-  //   }
-  //   const restaurantMarksArray = nearRestaurantData.map((shop) => {
-  //     return {
-  //       title: shop.Name,
-  //       id: shop.ID,
-  //       url: shop.Picture.PictureUrl1,
-  //       alt: shop.Picture.PictureDescription1,
-  //       address: shop.Address,
-  //       open: shop.OpenTime,
-  //       coords: {
-  //         lat: shop.Position.PositionLat,
-  //         lng: shop.Position.PositionLon,
-  //       },
-  //       phone: shop.Phone,
-  //     };
-  //   });
+    if (routeDirection === "1") {
+      busLine.current = window.L.geoJSON(wkt.toJson(), {
+        style: function () {
+          return {
+            color: "#FFBAC3",
+          };
+        },
+      }).addTo(map);
+    }
 
-  //   const restaurantMarks = restaurantMarksArray.map((shop) => {
-  //     return window.L.marker(shop.coords, {
-  //       icon: window.L.icon({
-  //         iconUrl: img.i_shopPin,
-  //         className: `pin--restaurant pin--restaurant--${shop.id}`,
-  //       }),
-  //     })
-  //       .bindPopup(renderRestaurantDetail(shop, dispatch))
-  //       .on("click", (e) => {
-  //         // console.log(e);
-  //         document
-  //           .querySelectorAll(".pin--restaurant")
-  //           .forEach((ele) => ele.classList.remove("icon--active"));
-  //         e.originalEvent.target.classList.add("icon--active");
-  //         dispatch(action.selectRestaurantCreator(shop.id));
-  //         map.setView(e.latlng, pinZoom);
-  //       });
-  //   });
+    busLine.current.addData(wkt.toJson());
 
-  //   nearShopsGroup.current = window.L.layerGroup(restaurantMarks);
-  //   map.addLayer(nearShopsGroup.current);
-  // }, [nearRestaurantData]);
+    map.flyToBounds(busLine.current.getBounds());
+  }, [shape, routeDirection]);
 
-  // useEffect(() => {
-  //   if (searchBikeMarksGroup.current) {
-  //     map.removeLayer(searchBikeMarksGroup.current);
-  //   }
-  //   if (!bikeData?.bikeData) {
-  //     // console.log("所查資料不存在");
-  //     return;
-  //   }
-  //   if (bikeData.bikeData.length !== bikeData.bikeAvailableData.length) {
-  //     console.log("搜尋結果資料數量無法匹配");
-  //     return;
-  //   }
+  useEffect(() => {
+    if (!routeStops) return;
 
-  //   //DRY:
-  //   //////////////////////////////
+    if (positionLayer.current) {
+      map.removeLayer(positionLayer.current);
+    }
 
-  //   const bikeStationArray = mergeBikeData(bikeData);
+    const stopPositionArray = routeStops[Number(routeDirection)].Stops.map(
+      (stopObj) => {
+        return {
+          coords: {
+            lat: stopObj.StopPosition.PositionLat,
+            lng: stopObj.StopPosition.PositionLon,
+          },
+          stopName: stopObj.StopName.Zh_tw,
+        };
+      }
+    );
 
-  //   const bikeMarks = bikeStationArray.map((station) => {
-  //     return window.L.marker(station.coords, {
-  //       icon: window.L.divIcon({
-  //         className: "pin--bike",
-  //         html: `
-  //         <div style="background-image: linear-gradient(180deg, white ${
-  //           100 -
-  //           (station.canRentBikes /
-  //             (station.canRentBikes + station.needReturnBikes)) *
-  //             100
-  //         }%, #d9ef08 ${
-  //           (station.canRentBikes /
-  //             (station.canRentBikes + station.needReturnBikes)) *
-  //           100
-  //         }%);">
-  //           <img src=${img.i_bike}></img>
-  //         </div>
-  //           `,
-  //       }),
-  //     })
-  //       .bindPopup(renderStationDetail(station, dispatch))
-  //       .on("click", (e) => {
-  //         map.setView(e.latlng, pinZoom);
-  //       });
-  //   });
+    if (routeDirection === "0") {
+      positionPointGroup.current = stopPositionArray.map((stop) => {
+        return window.L.marker(stop.coords, {
+          icon: window.L.icon({
+            iconUrl: img.i_stopIcon0,
+            className: "icon--stop",
+          }),
+        }).bindPopup(stop.stopName, {
+          className: "popup--stop",
+        });
+      });
+    }
 
-  //   //////////////////////////////
+    if (routeDirection === "1") {
+      positionPointGroup.current = stopPositionArray.map((stop) => {
+        return window.L.marker(stop.coords, {
+          icon: window.L.icon({
+            iconUrl: img.i_stopIcon1,
+            className: "icon--stop",
+          }),
+        }).bindPopup(stop.stopName, {
+          className: "popup--stop",
+        });
+      });
+    }
 
-  //   if (bikeStationArray.length !== 0) {
-  //     let searchCenter = bikeStationArray[0].coords;
-  //     map.setView(searchCenter, searchZoom);
-  //     searchBikeMarksGroup.current = window.L.layerGroup(bikeMarks);
-  //     map.addLayer(searchBikeMarksGroup.current);
-  //   }
-  // }, [bikeData]);
+    positionLayer.current = window.L.layerGroup(positionPointGroup.current);
+    map.addLayer(positionLayer.current);
 
-  // useEffect(() => {
-  //   if (!selectRoad) {
-  //     return;
-  //   }
+    // console.log(StopPosition);
+  }, [routeStops, routeDirection]);
 
-  //   if (road.current) {
-  //     map.removeLayer(road.current);
-  //   }
+  useEffect(() => {
+    if (!hideStop && positionLayer.current) {
+      map.removeLayer(positionLayer.current);
+      return;
+    }
 
-  //   // road.current = window.L.geoJson().addTo(map);
-  //   // road.current.addData(selectRoad.Geometry);
-  //   // map.flyToBounds(road.current.getBounds());
+    if (hideStop && positionLayer.current) {
+      map.addLayer(positionLayer.current);
+      return;
+    }
+  }, [hideStop, routeDirection]);
 
-  //   const options = {
-  //     // use: window.L.polyline,
-  //     delay: 800,
-  //     dashArray: [30, 40],
-  //     weight: 10,
-  //     color: "#009BB1",
-  //     // reverse: true,
-  //     pulseColor: "#FFFFFF",
-  //   };
+  return (
+    <React.Fragment>
+      <div className="leaflet__header">
+        <Header />
+        {target && <div>{`${target.routeName} 路線圖`}</div>}
+        <button
+          onClick={() => {
+            setHideStop((pre) => !pre);
+          }}
+        >
+          123
+        </button>
+      </div>
 
-  //   let reverseCoords = selectRoad.Geometry.coordinates.map((poly) => {
-  //     return poly.map((point) => point.reverse());
-  //   });
-
-  //   road.current = window.L.polyline.antPath(reverseCoords, options);
-  //   console.log(road.current);
-  //   map.addLayer(road.current);
-  //   map.flyToBounds(road.current.getBounds());
-  // }, [selectRoad]);
-
-  return <div id="map" class="map"></div>;
+      <div id="map" class="map"></div>
+    </React.Fragment>
+  );
 };
 
 export default LeafletMap;

@@ -10,8 +10,17 @@ import i_time from "./icons/time.svg";
 import i_wheel from "./icons/wheel.png";
 import i_menuB from "./icons/menuB.svg";
 import i_menuW from "./icons/menuW.svg";
+import i_arrowsAltB from "./icons/arrowsAltB.svg";
+import i_arrowsAltW from "./icons/arrowsAltW.svg";
+import i_location from "./icons/location.svg";
+import i_leftArrowW from "./icons/leftArrowW.svg";
+import i_leftArrowB from "./icons/leftArrowB.svg";
+import i_switch from "./icons/switch.svg";
+import i_stopIcon0 from "./icons/stopIcon0.svg";
+import i_stopIcon1 from "./icons/stopIcon1.svg";
 
 import logo from "./logo.png";
+import logoB from "./logoB.png";
 import bg from "./bgPic.png";
 import bg2x from "./bgPic@2x.png";
 import bgMobile from "./bgMobile.svg";
@@ -36,6 +45,15 @@ const img = {
   searchBus,
   i_menuB,
   i_menuW,
+  i_arrowsAltB,
+  i_arrowsAltW,
+  i_location,
+  i_leftArrowW,
+  i_leftArrowB,
+  logoB,
+  i_switch,
+  i_stopIcon0,
+  i_stopIcon1,
 };
 
 export default img;

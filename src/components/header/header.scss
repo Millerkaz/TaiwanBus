@@ -1,16 +1,46 @@
 .header {
+  width: 100%;
+  background-color: #5a637e;
+
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 1rem 0;
 
-  &__menu {
-    color: white;
+  img {
     cursor: pointer;
+  }
+
+  &__menu {
+    margin-left: 1rem;
+    width: 2.5rem;
+    height: 2rem;
+  }
+
+  &__logo {
+    margin-right: 1rem;
+    width: 12.4rem;
+    height: 4.2rem;
+  }
+}
+
+.header-B {
+  width: 100%;
+  padding: 1rem;
+  padding-bottom: 2rem;
+  background-color: white;
+
+  &__menu {
+    width: 2.5rem;
+    height: 2rem;
   }
 
   &__logo {
     width: 12.4rem;
     height: 4.2rem;
-    cursor: pointer;
   }
+}
+
+.header--hidden {
+  display: none;
 }
