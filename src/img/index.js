@@ -18,14 +18,18 @@ import i_leftArrowB from "./icons/leftArrowB.svg";
 import i_switch from "./icons/switch.svg";
 import i_stopIcon0 from "./icons/stopIcon0.svg";
 import i_stopIcon1 from "./icons/stopIcon1.svg";
+import i_busPosition from "./icons/busPosition.svg";
 
 import logo from "./logo.png";
 import logoB from "./logoB.png";
 import bg from "./bgPic.png";
 import bg2x from "./bgPic@2x.png";
-import bgMobile from "./bgMobile.svg";
+import bgMobile from "./bgMobile.png";
 import noBus from "./noBus.svg";
 import searchBus from "./searchBus.svg";
+import swithBtnOff from "./swithBtnOff.png";
+import swithBtnOn from "./swithBtnOn.png";
+
 const img = {
   i_arrowD,
   i_backspace,
@@ -54,6 +58,9 @@ const img = {
   i_switch,
   i_stopIcon0,
   i_stopIcon1,
+  i_busPosition,
+  swithBtnOff,
+  swithBtnOn,
 };
 
 export default img;

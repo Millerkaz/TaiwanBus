@@ -5,9 +5,9 @@ import history from "../../helper/history";
 
 import { action } from "../../store";
 
-const Popup = props => {
+const Popup = (props) => {
   const dispatch = useDispatch();
-  const isWindowShow = useSelector(state => state.popWindow.show);
+  const isWindowShow = useSelector((state) => state.popWindow.show);
 
   return ReactDOM.createPortal(
     <div
@@ -20,7 +20,7 @@ const Popup = props => {
     >
       <div
         className="popup__container"
-        onClick={e => {
+        onClick={(e) => {
           e.stopPropagation();
         }}
       >

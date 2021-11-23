@@ -5,6 +5,7 @@ import { PTX } from "../../API";
 import { useDispatch, useSelector } from "react-redux";
 import { action } from "../../store";
 import img from "../../img";
+import { historyPush } from "../../helper";
 
 import Header from "../header/header";
 import Btn from "../btn";
@@ -131,67 +132,38 @@ const mapBuild = () => {
 //     if (station.StationUID !== bikeDataFromState.bikeData[i].StationUID) return;
 
 //     return {
-//       UID: station.StationUID,
-//       canRentBikes: station.AvailableRentBikes,
-//       needReturnBikes: station.AvailableReturnBikes,
-//       coords: {
-//         lat: bikeDataFromState.bikeData[i].StationPosition.PositionLat,
-//         lng: bikeDataFromState.bikeData[i].StationPosition.PositionLon,
-//       },
-//       name: {
-//         tw: bikeDataFromState.bikeData[i].StationName.Zh_tw.split("_"),
-//         en: bikeDataFromState.bikeData[i].StationName.En.split("_"),
-//       },
-//       address: bikeDataFromState.bikeData[i].StationAddress,
-//     };
-//   });
+
 // };
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
 const LeafletMap = (props) => {
   const [hideStop, setHideStop] = useState(false);
-
   const target = useSelector((state) => state.targetBusRenderData.target);
   const shape = useSelector((state) => state.targetBusRenderData?.routeShape);
+  const busPosition = useSelector(
+    (state) => state.targetBusRenderData.busPosition
+  );
   const routeDirection = useSelector((state) => state.routeDirection);
   const routeStops = useSelector(
     (state) => state.targetBusRenderData.routeStops
   );
+  const stopIndex = useSelector((state) => state.stopIndex);
 
   const busLine = useRef(null);
-  const positionPointGroup = useRef(null);
-  const positionLayer = useRef(null);
-  const searchBikeMarksGroup = useRef(null);
+  const stopMarksArray = useRef(null);
+  const stopOnMapGroup = useRef(null);
+  const busMarkArray = useRef(null);
+  const busOnMapGroup = useRef(null);
 
+  // 初始化 : 建立MAP
   useEffect(() => {
     mapBuild();
 
-    // const detailCardClickHandler = (e) => {
-    //   if (e.target.closest(".btn--detailCard")) {
-    //     const coords = {
-    //       lat: +e.target.dataset.lat,
-    //       lng: +e.target.dataset.lng,
-    //     };
-
-    //     map.setView(coords, 16);
-
-    //     dispatch(action.fetchRestaurantDataCreator(coords));
-    //   }
-    // };
-
-    // document
-    //   .querySelector(".map")
-    //   .addEventListener("click", detailCardClickHandler);
-
-    return () => {
-      // console.log("remove");
-      // document
-      //   .querySelector(".map")
-      //   .removeEventListener("click", detailCardClickHandler);
-    };
+    return () => {};
   }, []);
 
+  //監聽 rerender : 公車實體線、行徑方向改變
   useEffect(() => {
     if (!shape) {
       return;
@@ -218,7 +190,7 @@ const LeafletMap = (props) => {
       busLine.current = window.L.geoJSON(wkt.toJson(), {
         style: function () {
           return {
-            color: "#FFBAC3",
+            color: "#f43b47",
           };
         },
       }).addTo(map);
@@ -229,11 +201,12 @@ const LeafletMap = (props) => {
     map.flyToBounds(busLine.current.getBounds());
   }, [shape, routeDirection]);
 
+  //監聽 rerender : 公車站牌位置、行徑方向改變
   useEffect(() => {
     if (!routeStops) return;
 
-    if (positionLayer.current) {
-      map.removeLayer(positionLayer.current);
+    if (stopOnMapGroup.current) {
+      map.removeLayer(stopOnMapGroup.current);
     }
 
     const stopPositionArray = routeStops[Number(routeDirection)].Stops.map(
@@ -249,7 +222,7 @@ const LeafletMap = (props) => {
     );
 
     if (routeDirection === "0") {
-      positionPointGroup.current = stopPositionArray.map((stop) => {
+      stopMarksArray.current = stopPositionArray.map((stop) => {
         return window.L.marker(stop.coords, {
           icon: window.L.icon({
             iconUrl: img.i_stopIcon0,
@@ -262,7 +235,7 @@ const LeafletMap = (props) => {
     }
 
     if (routeDirection === "1") {
-      positionPointGroup.current = stopPositionArray.map((stop) => {
+      stopMarksArray.current = stopPositionArray.map((stop) => {
         return window.L.marker(stop.coords, {
           icon: window.L.icon({
             iconUrl: img.i_stopIcon1,
@@ -274,36 +247,84 @@ const LeafletMap = (props) => {
       });
     }
 
-    positionLayer.current = window.L.layerGroup(positionPointGroup.current);
-    map.addLayer(positionLayer.current);
+    stopOnMapGroup.current = window.L.layerGroup(stopMarksArray.current);
+
+    if (hideStop) return;
+
+    map.addLayer(stopOnMapGroup.current);
 
     // console.log(StopPosition);
   }, [routeStops, routeDirection]);
 
+  //監聽 rerender : 是否隱藏地圖上站牌圖標
   useEffect(() => {
-    if (!hideStop && positionLayer.current) {
-      map.removeLayer(positionLayer.current);
-      return;
+    if (!stopOnMapGroup.current) return;
+
+    map.removeLayer(stopOnMapGroup.current);
+
+    if (!hideStop) {
+      map.addLayer(stopOnMapGroup.current);
+    }
+  }, [hideStop]);
+
+  //監聽 rerender : 公車位置、行徑方向改變
+  useEffect(() => {
+    if (!busPosition) return;
+
+    if (busOnMapGroup.current) {
+      map.removeLayer(busOnMapGroup.current);
     }
 
-    if (hideStop && positionLayer.current) {
-      map.addLayer(positionLayer.current);
-      return;
-    }
-  }, [hideStop, routeDirection]);
+    busMarkArray.current = busPosition[Number(routeDirection)].map((bus) => {
+      return window.L.marker(bus.coords, {
+        icon: window.L.icon({
+          iconUrl: img.i_busPosition,
+          className: "icon--bus",
+        }),
+      });
+    });
+
+    busOnMapGroup.current = window.L.layerGroup(busMarkArray.current);
+    map.addLayer(busOnMapGroup.current);
+  }, [busPosition, routeDirection]);
+
+  useEffect(() => {
+    if (!stopIndex && stopIndex !== 0) return;
+    stopMarksArray.current[stopIndex].openPopup();
+    map.flyTo(stopMarksArray.current[stopIndex].getLatLng(), 18);
+  }, [stopIndex]);
 
   return (
     <React.Fragment>
       <div className="leaflet__header">
         <Header />
-        {target && <div>{`${target.routeName} 路線圖`}</div>}
-        <button
+        {target && (
+          <div className="leaflet__header--title">
+            <img
+              style={{ cursor: "pointer" }}
+              alt="back"
+              src={img.i_leftArrowB}
+              onClick={() => {
+                historyPush("/searchBus");
+              }}
+            />
+            <p>{`${target.routeName} 路線圖`}</p>
+          </div>
+        )}
+        <div
+          className="leaflet__header--switch"
+          style={{ cursor: "pointer" }}
           onClick={() => {
             setHideStop((pre) => !pre);
           }}
         >
-          123
-        </button>
+          <p>顯示站點</p>
+          {hideStop ? (
+            <img src={img.swithBtnOff} alt="closePoint" />
+          ) : (
+            <img src={img.swithBtnOn} alt="openPoint" />
+          )}
+        </div>
       </div>
 
       <div id="map" class="map"></div>

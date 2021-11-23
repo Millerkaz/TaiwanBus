@@ -8,21 +8,21 @@ import { action } from "../../store";
 import "./popup.scss";
 
 const Popup = (props) => {
-  const dispatch = useDispatch();
-  const isWindowShow = useSelector((state) => state.popWindow.show);
-
-  return (
-    <React.Fragment>
-      <div>close</div>
+  return ReactDOM.createPortal(
+    <div
+      className={`popup__overlay ${props.isPopupOpen ? "" : "hidden--popup"}`}
+      onClick={props.setIsPopupOpen}
+    >
       <div
-        className={`popup__container  ${isWindowShow ? "" : "popup__hidden"}`}
+        className="popup__container"
         onClick={(e) => {
           e.stopPropagation();
         }}
       >
         {props.children}
       </div>
-    </React.Fragment>
+    </div>,
+    document.querySelector("#root")
   );
 };
 

@@ -12,15 +12,18 @@
   }
 
   ul {
+    height: 22rem;
     user-select: none;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-gap: 1rem;
+    overflow: hidden;
+    transition: all 0.2s;
   }
 }
 
 .hidden--keyboard {
-  display: none !important;
+  height: 0 !important;
 }
 
 .rotate {

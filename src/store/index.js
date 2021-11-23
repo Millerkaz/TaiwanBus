@@ -12,9 +12,7 @@ const TARGET_BUS_ONCLICK = "TARGET_BUS_ONCLICK";
 const CHANGE_DIRECTION = "CHANGE_DIRECTION";
 const CHANGE_DIRECTION_FORCE_0 = "CHANGE_DIRECTION_FORCE_0";
 
-const SELECT_ROAD = "SELECT_ROAD";
-
-const CLOSE_ERROR_SCREEN = "CLOSE_ERROR_SCREEN";
+const SELECT_STOP = "SELECT_STOP";
 
 const POP_SHOW = "POP_SHOW";
 const POP_HIDE = "POP_HIDE";
@@ -179,7 +177,31 @@ export const action = {
         if (bus.data.length === 0) return;
         busTypeObj[bus.data[0]?.PlateNumb] = bus.data[0]?.VehicleType;
       });
-      console.log(busTypeObj);
+
+      const busPositionSort = [];
+      busPositionSort[0] = busPosition
+        .filter((bus) => bus.Direction === 0)
+        .map((bus) => {
+          return {
+            plateNumb: bus.PlateNumb,
+            coords: {
+              lat: bus.BusPosition.PositionLat,
+              lng: bus.BusPosition.PositionLon,
+            },
+          };
+        });
+
+      busPositionSort[1] = busPosition
+        .filter((bus) => bus.Direction === 1)
+        .map((bus) => {
+          return {
+            plateNumb: bus.PlateNumb,
+            coords: {
+              lat: bus.BusPosition.PositionLat,
+              lng: bus.BusPosition.PositionLon,
+            },
+          };
+        });
 
       const [routeDirection0Name, routeDirection0Bus] = stopBusSortHelper(
         stopsArray,
@@ -200,7 +222,7 @@ export const action = {
         payload: {
           target: { routeName, routeUID, city },
           busCurrentStop,
-          busPosition,
+          busPosition: busPositionSort,
           routeShape: data[2].data,
           estimateTime,
           routeStops: stopsArray,
@@ -248,6 +270,13 @@ export const action = {
     }
 
     return { type: CHANGE_DIRECTION_FORCE_0 };
+  },
+
+  setStopIndexCreator: (index) => {
+    return {
+      type: SELECT_STOP,
+      payload: index,
+    };
   },
 };
 
@@ -307,6 +336,14 @@ const changeDirectionReducer = (preState = "0", action) => {
   return preState;
 };
 
+const setStopIndexReducer = (preState = null, action) => {
+  if (action.type === SELECT_STOP) {
+    return action.payload;
+  }
+
+  return preState;
+};
+
 export const reducers = combineReducers({
   //維持資料一致性， data為 [ [ {...},{...} ] , [ {...} ] ,...] ，顯示時站牌時抓每一項[0]的 StopName.Zh_tw
   mainSearchData: mainSearchDataReducer,
@@ -316,6 +353,8 @@ export const reducers = combineReducers({
   popWindow: popWindowReducer,
 
   routeDirection: changeDirectionReducer,
+
+  stopIndex: setStopIndexReducer,
 
   form: formReducer,
 });

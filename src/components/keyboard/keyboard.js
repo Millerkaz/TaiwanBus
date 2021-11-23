@@ -38,10 +38,18 @@ const Keyboard = (props) => {
         />
       </div>
       <ul className={`${hideKeyboard ? "hidden--keyboard" : ""}`}>
-        <li className="btn btn--keyboard" onClick={btnClickHandler}>
+        <li
+          className="btn btn--keyboard"
+          style={{ backgroundColor: `#DE6868`, color: "white" }}
+          onClick={btnClickHandler}
+        >
           紅
         </li>
-        <li className="btn btn--keyboard" onClick={btnClickHandler}>
+        <li
+          className="btn btn--keyboard"
+          style={{ backgroundColor: `#5274CD`, color: "white" }}
+          onClick={btnClickHandler}
+        >
           藍
         </li>
         <li className="btn btn--keyboard" onClick={btnClickHandler}>
@@ -53,10 +61,18 @@ const Keyboard = (props) => {
         <li className="btn btn--keyboard" onClick={btnClickHandler}>
           3
         </li>
-        <li className="btn btn--keyboard" onClick={btnClickHandler}>
+        <li
+          className="btn btn--keyboard"
+          style={{ backgroundColor: `#B29076`, color: "white" }}
+          onClick={btnClickHandler}
+        >
           棕
         </li>
-        <li className="btn btn--keyboard" onClick={btnClickHandler}>
+        <li
+          className="btn btn--keyboard"
+          style={{ backgroundColor: `#83C986`, color: "white" }}
+          onClick={btnClickHandler}
+        >
           綠
         </li>
         <li className="btn btn--keyboard" onClick={btnClickHandler}>
@@ -68,10 +84,18 @@ const Keyboard = (props) => {
         <li className="btn btn--keyboard" onClick={btnClickHandler}>
           6
         </li>
-        <li className="btn btn--keyboard" onClick={btnClickHandler}>
+        <li
+          className="btn btn--keyboard"
+          style={{ backgroundColor: `#EDBE62`, color: "white" }}
+          onClick={btnClickHandler}
+        >
           黃
         </li>
-        <li className="btn btn--keyboard" onClick={btnClickHandler}>
+        <li
+          className="btn btn--keyboard"
+          style={{ backgroundColor: `#E88C59`, color: "white" }}
+          onClick={btnClickHandler}
+        >
           橘
         </li>
         <li className="btn btn--keyboard" onClick={btnClickHandler}>
@@ -83,16 +107,23 @@ const Keyboard = (props) => {
         <li className="btn btn--keyboard" onClick={btnClickHandler}>
           9
         </li>
-        <li className="btn btn--keyboard" onClick={btnClickHandler}>
-          幹線
-        </li>
         <li
           className="btn btn--keyboard"
-          onClick={() => {
-            console.log("more");
+          style={{
+            backgroundColor: `#FFFFFF`,
+            border: "1px solid #8B94B2",
+            color: "#4C546A",
           }}
+          onClick={btnClickHandler}
         >
-          更多
+          F
+        </li>
+        <li
+          style={{ backgroundColor: `#B1B4BE`, color: "white" }}
+          className="btn btn--keyboard"
+          onClick={btnClickHandler}
+        >
+          幹線
         </li>
         <li
           className="btn btn--keyboard"
@@ -113,7 +144,7 @@ const Keyboard = (props) => {
             });
           }}
         >
-          {"<"}
+          <img src={img.i_backspace} alt="backSpace" />
         </li>
       </ul>
     </div>

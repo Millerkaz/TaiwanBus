@@ -44,8 +44,11 @@ const TargetBusTitle = (props) => {
             alt="back"
           />
         </div>
-        <div className="btn btn--icon targetBusTitle__icons--location">
-          <img src={img.i_location} alt="map" onClick={props.mapClickHandler} />
+        <div
+          className="btn btn--icon targetBusTitle__icons--location"
+          onClick={props.mapClickHandler}
+        >
+          <img src={img.i_location} alt="map" />
         </div>
         {/* <div>
           <img src={img.i_busW} alt="bus" />

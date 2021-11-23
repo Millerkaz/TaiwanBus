@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 // import BusSearchSideBar from "../busSearchSideBar/busSearchSideBar";
 import ListSmallCard from "../../../components/card/listSmallCard/listSmallCard";
@@ -54,6 +54,18 @@ const renderMainSearchData = (data) => {
 
 const BusSearchList = (props) => {
   const mainSearchData = useSelector((state) => state.mainSearchData);
+  const [height, setHeight] = useState(window.innerHeight);
+
+  useEffect(() => {
+    const heighCheck = () => {
+      setHeight(window.innerHeight);
+    };
+    window.addEventListener("resize", heighCheck);
+
+    return () => {
+      window.removeEventListener("resize", heighCheck);
+    };
+  }, []);
 
   if (!mainSearchData.data) {
     return (
@@ -78,7 +90,9 @@ const BusSearchList = (props) => {
   }
 
   return (
-    <div className="busSearchList">{renderMainSearchData(mainSearchData)}</div>
+    <div className="busSearchList" style={{ height: `${height - 300}px` }}>
+      {renderMainSearchData(mainSearchData)}
+    </div>
   );
 };
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { action } from "../../store";
 import { getStopStartAndEndNameHelper } from "../../helper";
@@ -46,12 +46,44 @@ const TargetBusDetail = (props) => {
   const [height, setHeight] = useState(window.innerHeight);
   const [hide, setHide] = useState(false);
   const [direction, setDirection] = useState("0");
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const mainSearchData = useSelector((state) => state.mainSearchData);
   const target = useSelector((state) => state.targetBusRenderData.target);
   const routeStops = useSelector(
     (state) => state.targetBusRenderData.routeStops
   );
   const dispatch = useDispatch();
+
+  const popupOpenHandler = useCallback(() => {
+    setIsPopupOpen((pre) => !pre);
+  }, []);
+
+  const mapClickHandler = useCallback((force = true) => {
+    if (force) {
+      setHide(true);
+      return;
+    }
+    setHide(false);
+  }, []);
+
+  const renderStopList = () => {
+    return routeStops[direction].Stops.map((stopObj, i) => {
+      return (
+        <li key={stopObj.StopName.Zh_tw + i}>
+          <span
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              popupOpenHandler();
+              mapClickHandler();
+              dispatch(action.setStopIndexCreator(i));
+            }}
+          >
+            {stopObj.StopName.Zh_tw}
+          </span>
+        </li>
+      );
+    });
+  };
 
   useEffect(() => {
     const heighCheck = () => {
@@ -84,20 +116,13 @@ const TargetBusDetail = (props) => {
     return <></>;
   }
 
-  // if (!routeStops[1]) {
-  //   // setDirection("0");
-  //   return <div>{"此線路無返程"}</div>;
-  // }
-
   return (
     <div className={`targetBusDetail ${!hide ? "" : "bg--hidden"}`}>
       <Header color="black" className={`${!hide ? "" : "header--hidden"}`} />
       <TargetBusTitle
         className={`${!hide ? "" : "title--hidden"}`}
         direction={direction}
-        mapClickHandler={() => {
-          setHide((pre) => !pre);
-        }}
+        mapClickHandler={mapClickHandler}
       />
       <div className="targetBusDetail__main">
         {!hide ? (
@@ -107,7 +132,7 @@ const TargetBusDetail = (props) => {
             src={img.i_arrowD}
             alt="back"
             onClick={() => {
-              setHide((pre) => !pre);
+              mapClickHandler(false);
             }}
           />
         )}
@@ -115,7 +140,9 @@ const TargetBusDetail = (props) => {
           <div className="targetBusDetail__nav--stop">
             <p>行駛方向</p>
             <p>
-              <span>往</span>
+              <span style={{ color: `${direction === "0" ? "" : "#f43b47"}` }}>
+                往
+              </span>
               {`${
                 getStopStartAndEndNameHelper(routeStops, Number(direction))[1]
               } 站`}
@@ -148,18 +175,27 @@ const TargetBusDetail = (props) => {
         >
           <TargetBusTime direction={direction} />
           <ul className="targetBusDetail__container--stopName">
-            {routeStops[direction].Stops.map((stopObj, i) => {
-              // console.log(stopObj.StopName.Zh_tw);
-              return (
-                <li key={stopObj.StopName.Zh_tw + i}>
-                  <span>{stopObj.StopName.Zh_tw}</span>
-                </li>
-              );
-            })}
+            {renderStopList()}
           </ul>
           <TargetBusPosition direction={direction} />
         </div>
       </div>
+      <Popup isPopupOpen={isPopupOpen} popUpOpenHandler={popupOpenHandler}>
+        <div className="targetBusDetail__popup">
+          <div className="targetBusDetail__popup--btns">
+            <p>收藏站牌</p>
+          </div>
+          <div className="targetBusDetail__popup--cancel">
+            <p
+              onClick={() => {
+                popupOpenHandler();
+              }}
+            >
+              取消
+            </p>
+          </div>
+        </div>
+      </Popup>
     </div>
   );
 };

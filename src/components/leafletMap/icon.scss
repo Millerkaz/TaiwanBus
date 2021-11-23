@@ -15,37 +15,8 @@
   // }
 
   &--stop {
-    width: 0.8rem;
-    height: 0.8rem;
-  }
-}
-
-.icon--active {
-  filter: drop-shadow(0px 0px 10px $color__main);
-  animation-name: iconsPulse;
-  animation-iteration-count: infinite;
-  animation-duration: 1s;
-}
-
-.pin--restaurant {
-}
-
-.pin--bike {
-  width: auto !important;
-  height: auto !important;
-  background: #ffffff;
-  border: 2px solid #323233;
-  box-sizing: border-box;
-  border-radius: 10rem;
-  overflow: hidden;
-
-  div {
-    width: 100%;
-
-    img {
-      width: 3rem;
-      height: 3rem;
-    }
+    width: 1.2rem;
+    height: 1.2rem;
   }
 }
 
