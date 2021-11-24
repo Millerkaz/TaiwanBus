@@ -1,21 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import Wkt from "wicket";
-
-import { PTX } from "../../API";
 import { useDispatch, useSelector } from "react-redux";
 import { action } from "../../store";
 import img from "../../img";
 import { historyPush } from "../../helper";
-
 import Header from "../header/header";
-import Btn from "../btn";
-// import img from "../../img";
+import BtnBar from "../btnBar/btnBar";
+
 import "./leafletMap.scss";
 import "./icon.scss";
 
 export let map;
 export let myself = null;
 export let myselfPosition;
+let circle = null;
 
 const wkt = new Wkt.Wkt();
 
@@ -24,50 +22,50 @@ const pinZoom = 17;
 
 let isFirstLocale = true;
 
-// export const listenMyselfPosition = (dispatch) => {
-//   const myselfMarker = window.L.icon({
-//     iconUrl: myself_img,
-//     className: "icon--myself",
-//   });
+export const listenMyselfPosition = (dispatch) => {
+  const myselfMarker = window.L.icon();
 
-//   const geoConfirmHandler = (e) => {
-//     if (isFirstLocale) {
-//       map.setView(e.latlng, pinZoom);
-//       dispatch(action.fetchNearBikeDataCreator(map.getCenter()));
-//       dispatch(action.fetchRestaurantDataCreator(map.getCenter()));
-//       isFirstLocale = false;
-//     }
-//     if (myself) {
-//       map.removeLayer(myself);
-//       // console.log("remove");
-//     }
+  const geoConfirmHandler = (e) => {
+    if (isFirstLocale) {
+      map.setView(e.latlng, pinZoom);
+      dispatch(action.fetchNearStopDataCreator(map.getCenter()));
+      // dispatch(action.fetchRestaurantDataCreator(map.getCenter()));
+      isFirstLocale = false;
+    }
+    if (myself) {
+      map.removeLayer(myself);
+    }
+    if (circle) {
+      map.removeLayer(circle);
+    }
 
-//     myselfPosition = e.latlng;
-//     myself = window.L.marker(e.latlng, { icon: myselfMarker });
-//     myself
-//       .bindPopup(
-//         `
-//     <div class="detailCard">
-//       <button class="btn btn--detailCard" data-lat=${e.latlng.lat} data-lng=${e.latlng.lng}>搜尋附近美食</button>
-//     </div>
-//     `
-//       )
-//       .addTo(map);
-//   };
+    circle = window.L.circle(e.latlng, {
+      color: "#FBD148",
+      fillColor: "#FFE652",
+      fillOpacity: 0.1,
+      radius: 500,
+    });
+    circle.addTo(map);
+    myselfPosition = e.latlng;
+    myself = window.L.marker(e.latlng);
+    myself.bindPopup(``).addTo(map);
+  };
 
-//   map.locate({
-//     // setView: true, // 是否讓地圖跟著移動中心點
-//     watch: true, // 是否要一直監測使用者位置
-//     maxZoom: 18, // 最大的縮放值
-//     enableHighAccuracy: true, // 是否要高精準度的抓位置
-//     timeout: 10000, // 觸發locationerror事件之前等待的毫秒數
-//   });
+  if (isFirstLocale) {
+    map.locate({
+      // setView: true,
+      watch: true,
+      maxZoom: 18,
+      enableHighAccuracy: true,
+      timeout: 10000,
+    });
 
-//   map.on("locationfound", geoConfirmHandler);
-// };
+    map.on("locationfound", geoConfirmHandler);
+  }
+};
 
 const mapBuild = () => {
-  map = window.L.map("map").setView([24, 121], 8);
+  map = window.L.map("map", { minZoom: 8 }).setView([23.8, 121], 8);
 
   window.L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
     attribution: `
@@ -137,9 +135,7 @@ const mapBuild = () => {
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-const LeafletMap = (props) => {
-  const [hideStop, setHideStop] = useState(false);
-  const target = useSelector((state) => state.targetBusRenderData.target);
+const LeafletMap = ({ hideStop }) => {
   const shape = useSelector((state) => state.targetBusRenderData?.routeShape);
   const busPosition = useSelector(
     (state) => state.targetBusRenderData.busPosition
@@ -159,6 +155,9 @@ const LeafletMap = (props) => {
   // 初始化 : 建立MAP
   useEffect(() => {
     mapBuild();
+    if (myselfPosition) {
+      map.setView(myselfPosition, 16);
+    }
 
     return () => {};
   }, []);
@@ -288,15 +287,24 @@ const LeafletMap = (props) => {
     map.addLayer(busOnMapGroup.current);
   }, [busPosition, routeDirection]);
 
+  //點擊站牌後移動到 MARK 位置
   useEffect(() => {
     if (!stopIndex && stopIndex !== 0) return;
-    stopMarksArray.current[stopIndex].openPopup();
-    map.flyTo(stopMarksArray.current[stopIndex].getLatLng(), 18);
+
+    if (!stopMarksArray.current) return;
+
+    stopMarksArray.current[stopIndex[0]].openPopup();
+    map.flyTo(stopMarksArray.current[stopIndex[0]].getLatLng(), 18);
   }, [stopIndex]);
 
-  return (
-    <React.Fragment>
-      <div className="leaflet__header">
+  return <div id="map" className="map"></div>;
+};
+
+export default LeafletMap;
+
+// <React.Fragment>
+{
+  /* <div className="leaflet__header">
         <Header />
         {target && (
           <div className="leaflet__header--title">
@@ -311,25 +319,29 @@ const LeafletMap = (props) => {
             <p>{`${target.routeName} 路線圖`}</p>
           </div>
         )}
-        <div
-          className="leaflet__header--switch"
-          style={{ cursor: "pointer" }}
-          onClick={() => {
-            setHideStop((pre) => !pre);
-          }}
-        >
-          <p>顯示站點</p>
-          {hideStop ? (
-            <img src={img.swithBtnOff} alt="closePoint" />
-          ) : (
-            <img src={img.swithBtnOn} alt="openPoint" />
+        <div className="leaflet__icons">
+          <div
+            className="leaflet__icons--switch"
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              setHideStop((pre) => !pre);
+            }}
+          >
+            <p>顯示站點</p>
+            {hideStop ? (
+              <img src={img.swithBtnOff} alt="closePoint" />
+            ) : (
+              <img src={img.swithBtnOn} alt="openPoint" />
+            )}
+          </div>
+          {props.location.pathname === "/busMap" && (
+            <BtnBar className="leaflet__icons--position" />
           )}
         </div>
-      </div>
+      </div> */
+}
 
-      <div id="map" class="map"></div>
-    </React.Fragment>
-  );
-};
-
-export default LeafletMap;
+// <div id="map" className="map"></div>
+{
+  /* </React.Fragment> */
+}

@@ -1,17 +1,17 @@
 .busSearchList {
   margin-top: 2rem;
-  display: flex;
+  // display: flex;
   justify-content: center;
   flex-wrap: wrap;
   max-height: 70vh;
   overflow: auto;
 
   &__first {
-    margin-top: 10rem;
-
     img {
       width: 40rem;
       width: 20rem;
+      display: block;
+      margin: 10rem auto 0 auto;
     }
     p {
       color: #bcc1d1;
@@ -24,7 +24,7 @@
   }
 
   &__no {
-    margin-top: 10rem;
+    // margin-top: 10rem;
     display: flex;
     flex-flow: column;
     align-items: center;
@@ -32,6 +32,8 @@
     img {
       width: 15rem;
       width: 10rem;
+      display: block;
+      margin: 10rem auto 0 auto;
     }
     p {
       color: #bcc1d1;

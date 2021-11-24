@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import Header from "../../components/header/header";
 import UseRouteIDForm from "./useRouteIDForm/useRouteIDForm";
 import Keyboard from "../../components/keyboard/keyboard";
@@ -13,7 +14,7 @@ const SearchPage = (props) => {
       <div className="searchPage__header">
         <Header />
         <p>
-          <a>首頁</a>
+          <Link to="/">首頁</Link>
           {"  >  "}
           <a>公車動態</a>
         </p>

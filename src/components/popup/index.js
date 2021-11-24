@@ -11,10 +11,12 @@ const Popup = (props) => {
   return ReactDOM.createPortal(
     <div
       className={`popup__overlay ${props.isPopupOpen ? "" : "hidden--popup"}`}
-      onClick={props.setIsPopupOpen}
+      onClick={props.popUpOpenHandler}
     >
       <div
-        className="popup__container"
+        className={`popup__container--${
+          props.isPopupOpen === "add" ? "bottom" : "middle"
+        }`}
         onClick={(e) => {
           e.stopPropagation();
         }}

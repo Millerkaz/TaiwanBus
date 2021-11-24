@@ -3,16 +3,16 @@ import { useSelector } from "react-redux";
 
 import "./targetBusPosition.scss";
 
-const renderTargetBus = (bus) => {
+const renderTargetBus = (bus, i) => {
   return (
     <ul className="targetBusPosition">
       {bus.map((v) => {
         if (v[0].length === 0) {
-          return <li></li>;
+          return <li key={i}></li>;
         }
 
         return (
-          <li>
+          <li key={i}>
             {v[0].map((eachBus) => {
               if (eachBus.DutyStatus === 2) {
                 return <p></p>;

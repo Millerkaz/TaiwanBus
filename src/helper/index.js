@@ -25,27 +25,27 @@ export const cityObj = {
   連江縣: "LienchiangCounty",
 };
 
-export const pageCalcHelper = (responseDataArray) => {
-  const cardPerPage = 12;
-  let page =
-    responseDataArray.length % cardPerPage === 0
-      ? responseDataArray.length / cardPerPage
-      : responseDataArray.length / cardPerPage + 1;
+// export const pageCalcHelper = (responseDataArray) => {
+//   const cardPerPage = 12;
+//   let page =
+//     responseDataArray.length % cardPerPage === 0
+//       ? responseDataArray.length / cardPerPage
+//       : responseDataArray.length / cardPerPage + 1;
 
-  // console.log(responseDataArray.length % cardPerPage === 0, responseDataArray.length / cardPerPage, page);
+//   // console.log(responseDataArray.length % cardPerPage === 0, responseDataArray.length / cardPerPage, page);
 
-  let dataForPageObj = {};
-  for (let i = 1; i <= page; i++) {
-    //62筆 = 0~19 20~39 40~59 60~62
-    dataForPageObj[i] = responseDataArray.slice(
-      (i - 1) * cardPerPage,
-      i * cardPerPage
-    );
-  }
+//   let dataForPageObj = {};
+//   for (let i = 1; i <= page; i++) {
+//     //62筆 = 0~19 20~39 40~59 60~62
+//     dataForPageObj[i] = responseDataArray.slice(
+//       (i - 1) * cardPerPage,
+//       i * cardPerPage
+//     );
+//   }
 
-  // console.log(dataForPageObj);
-  return dataForPageObj;
-};
+//   // console.log(dataForPageObj);
+//   return dataForPageObj;
+// };
 
 export const historyPush = (path) => {
   window.scroll(0, 0);
@@ -116,8 +116,8 @@ export function stopBusSortHelper(
   const stops = {};
   let stopDirectionArray = stopsArray[Direction]?.Stops;
 
-  console.log(stopsArray[Direction]);
-  console.log(stopsArray);
+  // console.log(stopsArray[Direction]);
+  // console.log(stopsArray);
 
   // 新竹縣 62 -> 只有單向
   if (!stopDirectionArray) {
@@ -152,6 +152,31 @@ export function stopBusSortHelper(
     ];
   });
 
-  console.log(stops);
+  // console.log(stops);
   return [Object.keys(stops), Object.values(stops)];
 }
+
+export const local = {
+  storeInLocal(key, value) {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  },
+
+  getLocal(key) {
+    return JSON.parse(window.localStorage.getItem(key));
+  },
+
+  initLocalData() {
+    let localData = this.getLocal("route");
+
+    if (!localData) {
+      localData = {};
+      this.storeInLocal("route", localData);
+    }
+
+    localData = this.getLocal("stop");
+    if (!localData) {
+      localData = {};
+      this.storeInLocal("stop", localData);
+    }
+  },
+};

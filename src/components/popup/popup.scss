@@ -12,17 +12,22 @@
     z-index: 1000000;
   }
 
-  &__container {
-    // width: 70%;
-    // height: 50vh;
-    // opacity: 1;
-    // background-color: white;
+  &__container--bottom {
     position: absolute;
 
     width: 95%;
     bottom: 5%;
     left: 50%;
     transform: translate(-50%);
+  }
+
+  &__container--middle {
+    position: absolute;
+
+    width: 95%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 }
 

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { action } from "../../store";
-import { getStopStartAndEndNameHelper } from "../../helper";
+import { getStopStartAndEndNameHelper, historyPush } from "../../helper";
 import TargetBusPosition from "./targetBusPosition/targetBusPosition";
 import TargetBusTime from "./targetBusTime/targetBusTime";
 import TargetBusTitle from "./targetBusTitle/targetBusTitle";
 import Header from "../../components/header/header";
+import Nav from "../../components/nav/nav";
 import Popup from "../../components/popup";
 
 import "./targetBusDetail.scss";
@@ -54,8 +55,18 @@ const TargetBusDetail = (props) => {
   );
   const dispatch = useDispatch();
 
-  const popupOpenHandler = useCallback(() => {
-    setIsPopupOpen((pre) => !pre);
+  const popupOpenHandler = useCallback((content) => {
+    if (content === "add") {
+      setIsPopupOpen("add");
+      return;
+    }
+
+    if (content === "success") {
+      setIsPopupOpen("success");
+      return;
+    }
+
+    setIsPopupOpen(false);
   }, []);
 
   const mapClickHandler = useCallback((force = true) => {
@@ -73,9 +84,9 @@ const TargetBusDetail = (props) => {
           <span
             style={{ cursor: "pointer" }}
             onClick={() => {
-              popupOpenHandler();
+              popupOpenHandler("add");
               mapClickHandler();
-              dispatch(action.setStopIndexCreator(i));
+              dispatch(action.setStopIndexCreator([i]));
             }}
           >
             {stopObj.StopName.Zh_tw}
@@ -99,7 +110,9 @@ const TargetBusDetail = (props) => {
     );
 
     return () => {
+      dispatch(action.clearTargetCreator());
       window.removeEventListener("resize", heighCheck);
+      // console.log("clear");
     };
   }, []);
 
@@ -109,6 +122,11 @@ const TargetBusDetail = (props) => {
   }, [target]);
 
   useEffect(() => {
+    if (
+      !mainSearchData.data ||
+      !mainSearchData?.data[props.match.params.routeName]
+    )
+      return;
     listClickHandler(mainSearchData, props, dispatch);
   }, [mainSearchData]);
 
@@ -118,12 +136,18 @@ const TargetBusDetail = (props) => {
 
   return (
     <div className={`targetBusDetail ${!hide ? "" : "bg--hidden"}`}>
-      <Header color="black" className={`${!hide ? "" : "header--hidden"}`} />
+      <Header
+        hide={hide}
+        color="black"
+        className={`header-B ${!hide ? "" : "header--hidden"}`}
+      />
+      {/* //// */}
       <TargetBusTitle
         className={`${!hide ? "" : "title--hidden"}`}
         direction={direction}
         mapClickHandler={mapClickHandler}
       />
+      {/* //// */}
       <div className="targetBusDetail__main">
         {!hide ? (
           ""
@@ -136,6 +160,7 @@ const TargetBusDetail = (props) => {
             }}
           />
         )}
+        {/* //// */}
         <div className="targetBusDetail__nav">
           <div className="targetBusDetail__nav--stop">
             <p>行駛方向</p>
@@ -169,6 +194,7 @@ const TargetBusDetail = (props) => {
             </div>
           )}
         </div>
+        {/* //// */}
         <div
           className="targetBusDetail__container"
           style={{ height: `${!hide ? `${height - 333}` : "200"}px` }}
@@ -180,21 +206,53 @@ const TargetBusDetail = (props) => {
           <TargetBusPosition direction={direction} />
         </div>
       </div>
+      {/* //// */}
       <Popup isPopupOpen={isPopupOpen} popUpOpenHandler={popupOpenHandler}>
-        <div className="targetBusDetail__popup">
-          <div className="targetBusDetail__popup--btns">
-            <p>收藏站牌</p>
+        {isPopupOpen === "add" && (
+          <div className="targetBusDetail__popup ">
+            <div className="targetBusDetail__popup--btns">
+              <p
+                onClick={() => {
+                  popupOpenHandler("success");
+                }}
+              >
+                收藏站牌
+              </p>
+            </div>
+            <div className="targetBusDetail__popup--cancel">
+              <p
+                onClick={() => {
+                  popupOpenHandler();
+                }}
+              >
+                取消
+              </p>
+            </div>
           </div>
-          <div className="targetBusDetail__popup--cancel">
-            <p
-              onClick={() => {
-                popupOpenHandler();
-              }}
-            >
-              取消
-            </p>
+        )}
+        {isPopupOpen === "success" && (
+          <div className="targetBusDetail__popup ">
+            <div className="targetBusDetail__popup--content">
+              <p>已成功收藏此站牌</p>
+            </div>
+            <div className="targetBusDetail__popup--btns">
+              <p
+                onClick={() => {
+                  popupOpenHandler();
+                }}
+              >
+                關閉
+              </p>
+              <p
+                onClick={() => {
+                  historyPush("/favorite");
+                }}
+              >
+                前往查看
+              </p>
+            </div>
           </div>
-        </div>
+        )}
       </Popup>
     </div>
   );

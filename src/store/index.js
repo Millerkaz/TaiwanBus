@@ -8,9 +8,12 @@ import { cityObj, dataFilterHelper, stopBusSortHelper } from "../helper";
 const FETCH_DATA = "FETCH_DATA";
 const REFETCH_NOW_BUS = "REFETCH_NOW_BUS";
 const TARGET_BUS_ONCLICK = "TARGET_BUS_ONCLICK";
+const CLEAR_TARGET = "CLEAR_TARGET";
 
 const CHANGE_DIRECTION = "CHANGE_DIRECTION";
 const CHANGE_DIRECTION_FORCE_0 = "CHANGE_DIRECTION_FORCE_0";
+
+const FETCH_NEAR_DATA = "FETCH_NEAR_DATA";
 
 const SELECT_STOP = "SELECT_STOP";
 
@@ -110,12 +113,12 @@ export const action = {
         `/v2/Bus/Station/NearBy?$top=10000&$spatialFilter=nearby(${lat}%2C${lng}%2C500)&$format=JSON`
       );
 
-      let data = dataFilterHelper(response.data);
-      // console.log(data);
+      // let data = dataFilterHelper(response.data);
+      // console.log(response.data);
 
       dispatch({
-        type: FETCH_DATA,
-        payload: data,
+        type: FETCH_NEAR_DATA,
+        payload: response.data,
       });
     };
   },
@@ -146,9 +149,6 @@ export const action = {
       let busPosition = PTX.get(
         `/v2/Bus/RealTimeByFrequency/City/${city}?$filter=contains(RouteUID%2C'${routeUID}')&$top=5000&$format=JSON`
       );
-      const routeShape = PTX.get(
-        `/v2/Bus/Shape/City/${city}?$filter=contains(RouteUID%2C'${routeUID}')&$top=5000&$format=JSON`
-      );
 
       let estimateTime = PTX.get(
         `/v2/Bus/EstimatedTimeOfArrival/City/${city}?$filter=contains(RouteUID%2C'${routeUID}')&$top=5000&$format=JSON`
@@ -157,13 +157,20 @@ export const action = {
       const data = await Promise.all([
         busCurrentStop,
         busPosition,
-        routeShape,
         estimateTime,
       ]);
 
+      //連江縣無提供 SHAPE DATE
+      let routeShape;
+      if (city !== "LienchiangCounty") {
+        routeShape = await PTX.get(
+          `/v2/Bus/Shape/City/${city}?$filter=contains(RouteUID%2C'${routeUID}')&$top=5000&$format=JSON`
+        );
+      }
+
       busCurrentStop = data[0].data;
       busPosition = data[1].data;
-      estimateTime = data[3].data;
+      estimateTime = data[2].data;
 
       const busTypePromises = busPosition.map((bus) => {
         return PTX.get(
@@ -223,7 +230,7 @@ export const action = {
           target: { routeName, routeUID, city },
           busCurrentStop,
           busPosition: busPositionSort,
-          routeShape: data[2].data,
+          routeShape: routeShape.data,
           estimateTime,
           routeStops: stopsArray,
           routeDirection0Bus,
@@ -278,6 +285,10 @@ export const action = {
       payload: index,
     };
   },
+
+  clearTargetCreator: () => {
+    return { type: CLEAR_TARGET };
+  },
 };
 
 //*---------------- Reducer ---------------- *//
@@ -300,6 +311,18 @@ const targetBusDataOnClickReducer = (preState = {}, action) => {
 
   if (action.type === REFETCH_NOW_BUS) {
     return { ...preState, ...action.payload };
+  }
+
+  if (action.type === CLEAR_TARGET) {
+    return {};
+  }
+
+  return preState;
+};
+
+const fetchNearDataReducer = (preState = [], action) => {
+  if (action.type === FETCH_NEAR_DATA) {
+    return [...action.payload];
   }
 
   return preState;
@@ -338,7 +361,7 @@ const changeDirectionReducer = (preState = "0", action) => {
 
 const setStopIndexReducer = (preState = null, action) => {
   if (action.type === SELECT_STOP) {
-    return action.payload;
+    return [...action.payload];
   }
 
   return preState;
@@ -349,6 +372,8 @@ export const reducers = combineReducers({
   mainSearchData: mainSearchDataReducer,
 
   targetBusRenderData: targetBusDataOnClickReducer,
+
+  nearBusData: fetchNearDataReducer,
 
   popWindow: popWindowReducer,
 

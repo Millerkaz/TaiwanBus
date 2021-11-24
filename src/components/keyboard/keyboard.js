@@ -20,7 +20,6 @@ const Keyboard = (props) => {
 
   useEffect(() => {
     dispatch(change("useRouteIDForm", "term", value.join("")));
-    console.log(value.join(""));
   }, [value]);
 
   return (

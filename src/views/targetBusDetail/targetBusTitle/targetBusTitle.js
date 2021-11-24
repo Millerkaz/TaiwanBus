@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { action } from "../../../store";
+import { useSelector, useDispatch } from "react-redux";
 import { getStopStartAndEndNameHelper, historyPush } from "../../../helper";
 import img from "../../../img";
 
@@ -22,6 +23,7 @@ const renderPath = (routeStop, direction = 0) => {
 };
 
 const TargetBusTitle = (props) => {
+  const dispatch = useDispatch();
   const target = useSelector((state) => state.targetBusRenderData.target);
   const routeStop = useSelector(
     (state) => state.targetBusRenderData.routeStops
@@ -38,6 +40,7 @@ const TargetBusTitle = (props) => {
           <img
             style={{ cursor: "pointer" }}
             onClick={() => {
+              // dispatch(action.clearTargetCreator());
               historyPush("/searchBus");
             }}
             src={img.i_leftArrowW}

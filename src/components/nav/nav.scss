@@ -1,0 +1,147 @@
+@import "../../sass/variable.scss";
+
+.nav {
+  width: 100%;
+  top: 0;
+  left: 0;
+  position: absolute;
+
+  &__container {
+  }
+
+  &__hack {
+    display: none;
+  }
+
+  &__hack:checked ~ &__bg {
+    transform: scale(5000);
+  }
+
+  &__hack:checked ~ &__list {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+
+  &__hack:checked + &__click > &__hamburger {
+    background-color: transparent;
+  }
+
+  &__hack:checked + &__click > &__hamburger::before {
+    // transform-origin: left;
+    background-color: white;
+    top: 0;
+    transform: rotate(135deg);
+  }
+
+  &__hack:checked + &__click > &__hamburger::after {
+    background-color: white;
+    top: 0;
+    // transform-origin: left;
+    transform: rotate(-135deg);
+  }
+
+  &__click {
+    top: 0%;
+    left: 0%;
+    position: fixed;
+    border-radius: 50rem;
+    width: 6rem;
+    height: 6rem;
+    z-index: 200001;
+    cursor: pointer;
+    text-align: center;
+    // box-shadow: 0 1rem 2rem rgba(black, 0.2);
+  }
+
+  &__hamburger {
+    position: relative;
+    margin: 2.8rem 0 0 -1rem;
+    background-color: white;
+
+    display: inline-block;
+    transition: transform 0.2s;
+    width: 2rem;
+    height: 3px;
+
+    &::after,
+    &::before {
+      background-color: white;
+      display: inline-block;
+      transition: transform 0.2s;
+      width: 3rem;
+      height: 3px;
+    }
+
+    &::before {
+      content: "";
+      top: -1rem;
+      left: 0;
+      position: absolute;
+    }
+
+    &::after {
+      content: "";
+      top: 1rem;
+      left: 0;
+      position: absolute;
+    }
+  }
+
+  &__bg {
+    transition: cubic-bezier(0.99, 0, 0.2, 1) 0.7s;
+    background-image: radial-gradient(#5a637e, #5a637e);
+    top: 1rem;
+    left: 1rem;
+    position: fixed;
+    border-radius: 50rem;
+    width: 0.1rem;
+    height: 0.1rem;
+    z-index: 200000;
+  }
+
+  &__list {
+    transition: cubic-bezier(0.82, -0.58, 0.24, 1.38) 0.7s;
+    opacity: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-1000%, -50%);
+    position: fixed;
+    z-index: 200005;
+    list-style: none;
+    font-size: 4rem;
+    width: 100%;
+  }
+
+  &__item {
+    // margin: 2.5rem;
+    display: flex;
+    justify-content: center;
+    color: #ffffff;
+  }
+
+  &__link {
+    color: #ffffff;
+    font-size: 2.4rem;
+    font-weight: 400;
+    line-height: 2.31rem;
+    letter-spacing: 0.17rem;
+    margin: 4rem 0;
+    padding: 0.9rem 2.8rem;
+    cursor: pointer;
+
+    &:hover {
+      border: 1px solid #ffffff;
+      box-sizing: border-box;
+      border-radius: 100px;
+      color: #ffffff;
+    }
+  }
+}
+
+.hamburger--B {
+  &,
+  &::after,
+  &::before {
+    background-color: #5a637e;
+  }
+}

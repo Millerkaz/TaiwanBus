@@ -41,11 +41,19 @@ const renderTargetBus = (bus) => {
     <ul className="targetBusTime">
       {bus.map((v) => {
         if (v[1].length === 0) {
-          return <li></li>;
+          return (
+            <li>
+              <span style={{ color: "#B4B3B3" }}>{"尚未發車"}</span>
+            </li>
+          );
         }
 
         if (v[1].StopStatus === 1) {
-          return <li>{"尚未發車"}</li>;
+          return (
+            <li>
+              <span style={{ color: "#B4B3B3" }}>{"尚未發車"}</span>
+            </li>
+          );
         }
         return <li>{renderEstimateTimeHelper(v[1][0])}</li>;
       })}

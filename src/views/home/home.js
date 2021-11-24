@@ -1,5 +1,6 @@
 import React from "react";
 import Footer from "../../components/footer/footer";
+import { map, myselfPosition } from "../../components/leafletMap/leafletMap";
 import img from "../../img";
 import { historyPush } from "../../helper";
 
@@ -19,27 +20,37 @@ const Home = (props) => {
               historyPush("/searchBus");
             }}
           >
-            <div class="btn btn--icon">
+            <div className="btn btn--icon">
               <img src={img.i_busW} alt="bus" />
             </div>
             <p>公車動態</p>
           </li>
-          <li>
-            <div class="btn btn--icon">
+          <li
+            onClick={() => {
+              historyPush("/busMap");
+              if (myselfPosition) {
+                map.setView(myselfPosition, 16);
+              }
+            }}
+          >
+            <div className="btn btn--icon">
               <img src={img.i_locate} alt="locate" />
             </div>
-
             <p>附近站點</p>
           </li>
           <li>
-            <div class="btn btn--icon">
+            <div className="btn btn--icon">
               <img src={img.i_time} alt="time" />
             </div>
 
             <p>班表查詢</p>
           </li>
-          <li>
-            <div class="btn btn--icon">
+          <li
+            onClick={() => {
+              historyPush("/favorite");
+            }}
+          >
+            <div className="btn btn--icon">
               <img src={img.i_heartW} alt="favor" />
             </div>
 

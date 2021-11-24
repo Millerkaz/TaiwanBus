@@ -19,6 +19,8 @@ import i_switch from "./icons/switch.svg";
 import i_stopIcon0 from "./icons/stopIcon0.svg";
 import i_stopIcon1 from "./icons/stopIcon1.svg";
 import i_busPosition from "./icons/busPosition.svg";
+import i_gps from "./icons/gps_fixed.png";
+import i_person from "./icons/person.png";
 
 import logo from "./logo.png";
 import logoB from "./logoB.png";
@@ -61,6 +63,8 @@ const img = {
   i_busPosition,
   swithBtnOff,
   swithBtnOn,
+  i_gps,
+  i_person,
 };
 
 export default img;
