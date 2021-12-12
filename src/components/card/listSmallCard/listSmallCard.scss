@@ -1,8 +1,11 @@
+@import "../../../sass/variable.scss";
+
 .listSmallCard {
   background: #ffffff;
   box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.08);
   border-radius: 2rem;
-  width: 90%;
+  width: 100%;
+  align-items: center;
   // flex: 0 1 90%;
   height: 7.1rem;
   padding: 1.2rem 1.6rem;
@@ -12,23 +15,52 @@
 
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  // align-items: flex-end;
   flex-wrap: wrap;
+
+  @include rwd(m-small) {
+    width: 90%;
+  }
 
   & div:first-child {
     flex: 1;
   }
 
   &__favor {
-    width: 10%;
+    width: 3rem;
     display: flex;
     flex-flow: column;
     align-items: center;
 
+    @include rwd(m-small) {
+      width: 4rem;
+    }
+
+    @include rwd(m-large) {
+      width: 7rem;
+    }
+
     img {
       width: 2rem;
       height: 1.6rem;
-      margin-bottom: 1.025rem;
+    }
+
+    span {
+      margin-top: 1.025rem;
+      font-size: 1rem;
+
+      @include rwd(m-large) {
+        font-size: 1.4rem;
+      }
+    }
+
+    p {
+      margin-top: 1.025rem;
+      font-size: 1rem;
+
+      @include rwd(m-large) {
+        font-size: 1.4rem;
+      }
     }
   }
 
@@ -38,13 +70,25 @@
     text-overflow: ellipsis;
     color: #f66a4b;
     margin-bottom: 0.2rem;
-    width: 100%;
+    width: 25rem;
 
     // text-align: center;
     font-weight: 400;
     font-size: 2rem;
     line-height: 2.9rem;
     font-family: "Noto Sans TC";
+
+    @include rwd(m-medium) {
+      width: 37rem;
+    }
+
+    @include rwd(lap) {
+      width: 28rem;
+    }
+
+    @include rwd(pc) {
+      width: 40rem;
+    }
   }
 
   &__subTitle {
@@ -90,4 +134,9 @@
   img {
     margin: 0;
   }
+}
+
+.subTitle--favoriteStop {
+  padding-bottom: 1rem;
+  width: 25rem;
 }

@@ -25,27 +25,55 @@ export const cityObj = {
   連江縣: "LienchiangCounty",
 };
 
-// export const pageCalcHelper = (responseDataArray) => {
-//   const cardPerPage = 12;
-//   let page =
-//     responseDataArray.length % cardPerPage === 0
-//       ? responseDataArray.length / cardPerPage
-//       : responseDataArray.length / cardPerPage + 1;
+export const cityISO = {
+  TPE: "Taipei",
+  TXG: "Taichung",
+  KEE: "Keelung",
+  TNN: "Tainan",
+  KHH: "Kaohsiung",
+  NWT: "NewTaipei",
+  ILA: "YilanCounty",
+  TAO: "Taoyuan",
+  CYI: "Chiayi",
+  HSQ: "HsinchuCounty",
+  MIA: "MiaoliCounty",
+  NAN: "NantouCounty",
+  CHA: "ChanghuaCounty",
+  HSZ: "Hsinchu",
+  YUN: "YunlinCounty",
+  CYQ: "ChiayiCounty",
+  PIF: "PingtungCounty",
+  HUA: "HualienCounty",
+  TTT: "TaitungCounty",
+  KIN: "KinmenCounty",
+  PEN: "PenghuCounty",
+  LIE: "LienchiangCounty",
+};
 
-//   // console.log(responseDataArray.length % cardPerPage === 0, responseDataArray.length / cardPerPage, page);
+export const local = {
+  storeInLocal(key, value) {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  },
 
-//   let dataForPageObj = {};
-//   for (let i = 1; i <= page; i++) {
-//     //62筆 = 0~19 20~39 40~59 60~62
-//     dataForPageObj[i] = responseDataArray.slice(
-//       (i - 1) * cardPerPage,
-//       i * cardPerPage
-//     );
-//   }
+  getLocal(key) {
+    return JSON.parse(window.localStorage.getItem(key));
+  },
 
-//   // console.log(dataForPageObj);
-//   return dataForPageObj;
-// };
+  initLocalData() {
+    let localData = this.getLocal("route");
+
+    if (!localData) {
+      localData = {};
+      this.storeInLocal("route", localData);
+    }
+
+    localData = this.getLocal("stop");
+    if (!localData) {
+      localData = {};
+      this.storeInLocal("stop", localData);
+    }
+  },
+};
 
 export const historyPush = (path) => {
   window.scroll(0, 0);
@@ -55,7 +83,12 @@ export const historyPush = (path) => {
 export const getStopStartAndEndNameHelper = (routeStop, direction = 0) => {
   if (!routeStop) return;
 
-  let filterValue = routeStop.find((route) => route.Direction === direction);
+  let filterValue = routeStop.find(
+    (route) =>
+      route.Direction === direction ||
+      route.Direction === 1 ||
+      route.Direction === 2
+  );
   let start = `${filterValue.Stops[0].StopName.Zh_tw} `;
   let end = ` ${
     filterValue.Stops[filterValue.Stops.length - 1].StopName.Zh_tw
@@ -156,27 +189,70 @@ export function stopBusSortHelper(
   return [Object.keys(stops), Object.values(stops)];
 }
 
-export const local = {
-  storeInLocal(key, value) {
-    window.localStorage.setItem(key, JSON.stringify(value));
-  },
+export const renderEstimateTimeHelper = (obj) => {
+  if (obj.StopStatus === 1) {
+    return <span style={{ color: "#B4B3B3" }}>{"尚未發車"}</span>;
+  }
 
-  getLocal(key) {
-    return JSON.parse(window.localStorage.getItem(key));
-  },
+  if (obj.StopStatus === 2) {
+    return <span style={{ color: "#B4B3B3" }}>{"交管不停靠"}</span>;
+  }
 
-  initLocalData() {
-    let localData = this.getLocal("route");
+  if (obj.StopStatus === 3) {
+    return <span style={{ color: "#B4B3B3" }}>{"末班車已過"}</span>;
+  }
 
-    if (!localData) {
-      localData = {};
-      this.storeInLocal("route", localData);
+  if (obj.StopStatus === 4) {
+    return <span style={{ color: "#B4B3B3" }}> {"今日未營運"}</span>;
+  }
+
+  if (Number(obj.EstimateTime) < 60) {
+    return (
+      <span className={"bus--arrive"} style={{ color: "#f66a4b" }}>
+        {"即將到站"}
+      </span>
+    );
+  }
+
+  if (Number(obj.EstimateTime) >= 60) {
+    return <span>{`${Math.ceil(Number(obj.EstimateTime) / 60)}分`}</span>;
+  }
+};
+
+export const addToFavoriteHelper = (key, data, setFunction) => {
+  let localData = local.getLocal(key);
+
+  if (key === "route") {
+    if (localData[data.routeUID]) {
+      delete localData[data.routeUID];
+      local.storeInLocal(key, localData);
+      setFunction(false);
+      return;
     }
 
-    localData = this.getLocal("stop");
-    if (!localData) {
-      localData = {};
-      this.storeInLocal("stop", localData);
+    localData[data.routeUID] = {
+      routeUID: data.routeUID,
+      routeName: data.routeName,
+      start: data.start,
+      end: data.end,
+      city: data.data.city,
+    };
+  }
+
+  if (key === "stop") {
+    if (localData[data.stopUID]) {
+      delete localData[data.stopUID];
+      local.storeInLocal(key, localData);
+      setFunction(false);
+      return;
     }
-  },
+
+    localData[data.stopUID] = {
+      stopUID: data.stopUID,
+      city: data.city,
+    };
+  }
+
+  local.storeInLocal(key, localData);
+  setFunction(true);
 };

@@ -1,16 +1,15 @@
 import React from "react";
 import Btn from "../btn";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   myselfPosition,
   map,
   listenMyselfPosition,
 } from "../leafletMap/leafletMap";
 import { action } from "../../store";
-import history from "../../helper/history";
-
 import img from "../../img";
 
+//主要用在地圖上的功能按鈕
 const BtnBar = (props) => {
   const dispatch = useDispatch();
 
@@ -19,7 +18,7 @@ const BtnBar = (props) => {
       <Btn
         onClick={() => {
           if (!myselfPosition) {
-            alert("請開啟定位");
+            alert("「我的位置」功能需先啟用定位。");
             return;
           }
 
@@ -27,7 +26,7 @@ const BtnBar = (props) => {
         }}
         color="location"
       >
-        <img src={img.i_person} />
+        <img src={img.i_person} alt="me" />
       </Btn>
       <Btn
         color="location"

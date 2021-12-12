@@ -2,14 +2,20 @@ import React, { useEffect } from "react";
 import { Router, Route } from "react-router-dom";
 import history from "./helper/history";
 import { local } from "./helper";
+import useDeviceCheck from "./hook/useDeviceCheck";
 import Home from "./views/home/home";
 import SearchPage from "./views/searchPage/searchPage";
 import TargetBusDetail from "./views/targetBusDetail/targetBusDetail";
 import NearSearchPage from "./views/nearSearchPage/nearSearchPage";
-import FavoritePage from "./views/favoritePage/favoritePage";
+import RouteChoicePage from "./views/routeChoicePage/routeChoicePage";
+import FavoriteRoutePage from "./views/favoriteRoutePage/favoriteRoutePage";
+import FavoriteStopPage from "./views/favoriteStopPage/favoriteStopPage";
+
 import "./sass/index.scss";
 
-const App = (props) => {
+const App = () => {
+  const device = useDeviceCheck();
+
   useEffect(() => {
     local.initLocalData();
   }, []);
@@ -18,14 +24,23 @@ const App = (props) => {
     <Router history={history}>
       <Route path="/" exact component={Home} />
       <Route path="/searchBus" exact component={SearchPage} />
-      <Route path="/busMap" component={NearSearchPage} />
+      {device === "normal" ? (
+        <Route exact path="/busMap" component={NearSearchPage} />
+      ) : (
+        <Route path="/busMap" component={NearSearchPage} />
+      )}
       <Route
         path="/busMap/:city/:routeName"
         exact
         component={TargetBusDetail}
       />
-      {/* <Route path="/schedule" exact component={BusRoutePopup} /> */}
-      <Route path="/favorite" exact component={FavoritePage} />
+      <Route
+        path="/routeChoice/:city/:stationUID"
+        exact
+        component={RouteChoicePage}
+      />
+      <Route path="/favorite/route" exact component={FavoriteRoutePage} />
+      <Route path="/favorite/stop" exact component={FavoriteStopPage} />
     </Router>
   );
 };

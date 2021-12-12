@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
-import { action } from "../../../store";
-import { useSelector, useDispatch } from "react-redux";
+import React from "react";
+import { useSelector } from "react-redux";
 import { getStopStartAndEndNameHelper, historyPush } from "../../../helper";
+import useDeviceCheck from "../../../hook/useDeviceCheck";
 import img from "../../../img";
 
 import "./targetBusTitle.scss";
@@ -16,22 +16,18 @@ const renderPath = (routeStop, direction = 0) => {
   return (
     <React.Fragment>
       {start}
-      <img src={img.i_arrowsAltW} />
+      <img src={img.i_arrowsAltW} alt="pass" />
       {end}
     </React.Fragment>
   );
 };
 
 const TargetBusTitle = (props) => {
-  const dispatch = useDispatch();
+  const device = useDeviceCheck();
   const target = useSelector((state) => state.targetBusRenderData.target);
   const routeStop = useSelector(
     (state) => state.targetBusRenderData.routeStops
   );
-
-  //   if (!target && !routeStop) {
-  //     return <></>;
-  //   }
 
   return (
     <div className={`targetBusTitle ${props.className || ""}`}>
@@ -40,22 +36,20 @@ const TargetBusTitle = (props) => {
           <img
             style={{ cursor: "pointer" }}
             onClick={() => {
-              // dispatch(action.clearTargetCreator());
               historyPush("/searchBus");
             }}
             src={img.i_leftArrowW}
             alt="back"
           />
         </div>
-        <div
-          className="btn btn--icon targetBusTitle__icons--location"
-          onClick={props.mapClickHandler}
-        >
-          <img src={img.i_location} alt="map" />
-        </div>
-        {/* <div>
-          <img src={img.i_busW} alt="bus" />
-        </div> */}
+        {device !== "normal" && (
+          <div
+            className="btn btn--icon targetBusTitle__icons--location"
+            onClick={props.mapClickHandler}
+          >
+            <img src={img.i_map} alt="map" />
+          </div>
+        )}
       </div>
       <div className="targetBusTitle__target">
         <h1>{target.routeName}</h1>

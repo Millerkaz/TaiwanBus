@@ -1,10 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import { reduxForm, Field } from "redux-form";
-import history from "../../helper/history";
-import { connect } from "react-redux";
 
-import { useDispatch, useSelector } from "react-redux";
-import { action } from "../../store";
 import Input from "../form/input/input";
 import Select from "../form/select/select";
 import Btn from "../btn";
@@ -14,13 +10,6 @@ import img from "../../img";
 import "./searchBar.scss";
 
 const SearchBar = (props) => {
-  const dispatch = useDispatch();
-
-  const formSubmitHandler = (valueObj) => {
-    // dispatch(action.clearNearDataCreator());
-    // dispatch(action.fetchBikeDataCreator(valueObj));
-  };
-
   return (
     <div className={`searchBar ${props.className || ""}`}>
       <div className="searchBar__container">

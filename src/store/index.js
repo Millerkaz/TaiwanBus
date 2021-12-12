@@ -17,13 +17,7 @@ const FETCH_NEAR_DATA = "FETCH_NEAR_DATA";
 
 const SELECT_STOP = "SELECT_STOP";
 
-const POP_SHOW = "POP_SHOW";
-const POP_HIDE = "POP_HIDE";
-
 //*---------------- Action ---------------- *//
-// const filterString = !coords
-//         ? ""
-//         : `$spatialFilter=nearby(${coords.lat}%2C${coords.lon}%2C10000)&$`;
 
 export const action = {
   fetchDataByRouteCreator: ({ term, cityCH }) => {
@@ -125,32 +119,22 @@ export const action = {
 
   ///////////////////////////////////////////////////////////
 
-  popWindowShowCreator: (component) => {
-    return {
-      type: POP_SHOW,
-      payload: component,
-    };
-  },
-
-  popWindowHideCreator: () => {
-    return {
-      type: POP_HIDE,
-      payload: null,
-    };
-  },
-
-  ///////////////////////////////////////////////////////////
-
   targetBusOnClickCreator: (routeName, routeUID, city, stopsArray) => {
     return async (dispatch) => {
-      let busCurrentStop = PTX.get(
+      let busCurrentStop;
+      let busPosition;
+      let estimateTime;
+
+      //基隆客運、公車資料混在一起...
+
+      busCurrentStop = PTX.get(
         `/v2/Bus/RealTimeNearStop/City/${city}?$filter=contains(RouteUID%2C'${routeUID}')&$top=5000&$format=JSON`
       );
-      let busPosition = PTX.get(
+      busPosition = PTX.get(
         `/v2/Bus/RealTimeByFrequency/City/${city}?$filter=contains(RouteUID%2C'${routeUID}')&$top=5000&$format=JSON`
       );
 
-      let estimateTime = PTX.get(
+      estimateTime = PTX.get(
         `/v2/Bus/EstimatedTimeOfArrival/City/${city}?$filter=contains(RouteUID%2C'${routeUID}')&$top=5000&$format=JSON`
       );
 
@@ -172,6 +156,7 @@ export const action = {
       busPosition = data[1].data;
       estimateTime = data[2].data;
 
+      /* 公車種類 API
       const busTypePromises = busPosition.map((bus) => {
         return PTX.get(
           `/v2/Bus/Vehicle/City/${city}?$filter=contains(PlateNumb%2C'${bus.PlateNumb}')&$top=20&$format=JSON`
@@ -184,6 +169,99 @@ export const action = {
         if (bus.data.length === 0) return;
         busTypeObj[bus.data[0]?.PlateNumb] = bus.data[0]?.VehicleType;
       });
+      */
+
+      // 分類 去程及返程 公車位置
+      const busPositionSort = [];
+      busPositionSort[0] = busPosition
+        .filter((bus) => bus.Direction === 0)
+        .map((bus) => {
+          return {
+            plateNumb: bus.PlateNumb,
+            coords: {
+              lat: bus.BusPosition.PositionLat,
+              lng: bus.BusPosition.PositionLon,
+            },
+          };
+        });
+
+      busPositionSort[1] = busPosition
+        .filter((bus) => bus.Direction === 1)
+        .map((bus) => {
+          return {
+            plateNumb: bus.PlateNumb,
+            coords: {
+              lat: bus.BusPosition.PositionLat,
+              lng: bus.BusPosition.PositionLon,
+            },
+          };
+        });
+
+      // 分類去程及返程公車在哪一站及抵達時間
+      const [routeDirection0Name, routeDirection0Bus] = stopBusSortHelper(
+        stopsArray,
+        busCurrentStop,
+        estimateTime,
+        0
+      );
+
+      const [routeDirection1Name, routeDirection1Bus] = stopBusSortHelper(
+        stopsArray,
+        busCurrentStop,
+        estimateTime,
+        1
+      );
+
+      dispatch({
+        type: TARGET_BUS_ONCLICK,
+        payload: {
+          target: { routeName, routeUID, city },
+          busCurrentStop,
+          busPosition: busPositionSort,
+          routeShape: routeShape.data,
+          estimateTime,
+          routeStops: stopsArray,
+          routeDirection0Bus,
+          routeDirection1Bus,
+          // busTypeObj,
+        },
+      });
+    };
+  },
+
+  reFetchNowBusCreator: (routeUID, city, stopsArray) => {
+    return async (dispatch) => {
+      let busCurrentStop = PTX.get(
+        `/v2/Bus/RealTimeNearStop/City/${city}?$filter=contains(RouteUID%2C'${routeUID}')&$top=5000&$format=JSON`
+      );
+      let busPosition = PTX.get(
+        `/v2/Bus/RealTimeByFrequency/City/${city}?$filter=contains(RouteUID%2C'${routeUID}')&$top=5000&$format=JSON`
+      );
+
+      let estimateTime = PTX.get(
+        `/v2/Bus/EstimatedTimeOfArrival/City/${city}?$filter=contains(RouteUID%2C'${routeUID}')&$top=5000&$format=JSON`
+      );
+
+      // let busPosition = PTX.get(
+      //   `/v2/Bus/RealTimeNearStop/City/${city}/${routeName}?$top=1000&$format=JSON`
+      // );
+      // let busCurrentStop = PTX.get(
+      //   `/v2/Bus/RealTimeByFrequency/City/${city}/${routeName}?$top=1000&$format=JSON`
+      // );
+
+      // let estimateTime = PTX.get(
+      //   `/v2/Bus/EstimatedTimeOfArrival/City/${city}?$filter=contains(RouteName%20%2FZh_tw%2C'${routeName}')&$top=5000&$format=JSON`
+      // );
+
+      const data = await Promise.all([
+        busPosition,
+        busCurrentStop,
+        estimateTime,
+      ]);
+
+      busPosition = data[0].data;
+      busCurrentStop = data[1].data;
+      estimateTime = data[2].data;
 
       const busPositionSort = [];
       busPositionSort[0] = busPosition
@@ -225,47 +303,13 @@ export const action = {
       );
 
       dispatch({
-        type: TARGET_BUS_ONCLICK,
-        payload: {
-          target: { routeName, routeUID, city },
-          busCurrentStop,
-          busPosition: busPositionSort,
-          routeShape: routeShape.data,
-          estimateTime,
-          routeStops: stopsArray,
-          routeDirection0Bus,
-          routeDirection1Bus,
-          busTypeObj,
-        },
-      });
-    };
-  },
-
-  reFetchNowBusCreator: (routeName, city) => {
-    return async (dispatch) => {
-      const busPosition = PTX.get(
-        `/v2/Bus/RealTimeNearStop/City/${city}/${routeName}?$top=1000&$format=JSON`
-      );
-      const busCurrentStop = PTX.get(
-        `/v2/Bus/RealTimeByFrequency/City/${city}/${routeName}?$top=1000&$format=JSON`
-      );
-
-      const estimateTime = PTX.get(
-        `/v2/Bus/EstimatedTimeOfArrival/City/${city}?$filter=contains(RouteName%20%2FZh_tw%2C'${routeName}')&$top=5000&$format=JSON`
-      );
-
-      const data = await Promise.all([
-        busPosition,
-        busCurrentStop,
-        estimateTime,
-      ]);
-
-      dispatch({
         type: REFETCH_NOW_BUS,
         payload: {
-          busPosition: data[0].data,
-          busCurrentStop: data[1].data,
-          estimateTime: data[2].data,
+          busPosition: busPositionSort,
+          busCurrentStop,
+          estimateTime,
+          routeDirection0Bus,
+          routeDirection1Bus,
         },
       });
     };
@@ -328,19 +372,6 @@ const fetchNearDataReducer = (preState = [], action) => {
   return preState;
 };
 
-const popWindowReducer = (preState = {}, action) => {
-  switch (action.type) {
-    case POP_SHOW:
-      return { ...preState, show: true, component: action.payload };
-
-    case POP_HIDE:
-      return { ...preState, show: false, component: null };
-
-    default:
-      return preState;
-  }
-};
-
 const changeDirectionReducer = (preState = "0", action) => {
   if (action.type === CHANGE_DIRECTION) {
     if (preState === "0") {
@@ -368,14 +399,11 @@ const setStopIndexReducer = (preState = null, action) => {
 };
 
 export const reducers = combineReducers({
-  //維持資料一致性， data為 [ [ {...},{...} ] , [ {...} ] ,...] ，顯示時站牌時抓每一項[0]的 StopName.Zh_tw
   mainSearchData: mainSearchDataReducer,
 
   targetBusRenderData: targetBusDataOnClickReducer,
 
   nearBusData: fetchNearDataReducer,
-
-  popWindow: popWindowReducer,
 
   routeDirection: changeDirectionReducer,
 
