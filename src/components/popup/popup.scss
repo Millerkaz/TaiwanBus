@@ -1,5 +1,4 @@
-#popup {
-}
+@import "../../sass/variable.scss";
 
 .popup {
   &__overlay {
@@ -16,9 +15,17 @@
     position: absolute;
 
     width: 95%;
-    bottom: 5%;
+    bottom: 12%;
     left: 50%;
     transform: translate(-50%);
+
+    @include rwd(lap) {
+      bottom: 0%;
+      top: 63%;
+      left: 50%;
+      transform: translate(-50%);
+      width: 15%;
+    }
   }
 
   &__container--middle {
@@ -28,6 +35,18 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+
+    @include rwd(lap) {
+      width: 35%;
+    }
+
+    @include rwd(pc) {
+      width: 25%;
+    }
+
+    @include rwd(pc-l) {
+      width: 20%;
+    }
   }
 }
 

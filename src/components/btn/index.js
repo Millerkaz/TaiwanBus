@@ -3,9 +3,10 @@ import "./btn.scss";
 
 /**
  *
+ * 通用按鈕
  * props:
  * @type 按鈕種類 ("string" : "link ", "anchor" , "button"(default))
- * @onClick click handler
+ * @onClick click handler (f)
  * @color 按鈕樣式 ("string")
  * @className ("string")
  *

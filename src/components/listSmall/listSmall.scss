@@ -1,0 +1,19 @@
+@import "../../sass/variable.scss";
+
+.listSmall {
+  margin-top: 2rem;
+  // max-height: 70vh;
+  overflow: auto;
+
+  @include rwd(lap) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 1rem;
+    align-content: flex-start;
+  }
+
+  div {
+    @include rwd(lap) {
+    }
+  }
+}

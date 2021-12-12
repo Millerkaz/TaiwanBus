@@ -1,42 +1,40 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { change } from "redux-form";
-import { useDispatch } from "react-redux";
-import Btn from "../btn";
+import { useDispatch, useSelector } from "react-redux";
 import img from "../../img";
 import "./keyboard.scss";
 
-const btnClickHandler = (e) => {};
-
 const Keyboard = (props) => {
+  const valueArray = useRef([]);
   const [value, setValue] = useState([]);
-  const [hideKeyboard, setHideKeyboard] = useState(false);
+  const formValue = useSelector(
+    (state) => state.form.useRouteIDForm?.values.term
+  );
   const dispatch = useDispatch();
 
   const btnClickHandler = (e) => {
-    setValue((pre) => {
-      return [...pre, e.target.textContent];
-    });
+    // console.log(valueArray.current);
+    valueArray.current = [...valueArray.current, e.target.textContent];
+    // console.log(valueArray.current);
+    setValue(valueArray.current);
   };
 
   useEffect(() => {
-    dispatch(change("useRouteIDForm", "term", value.join("")));
+    dispatch(change("useRouteIDForm", "term", ""));
+    dispatch(change("useRouteIDForm", "term", valueArray.current.join("")));
   }, [value]);
+
+  useEffect(() => {
+    if (!formValue) return;
+    if (formValue.length === valueArray.current.length) return;
+    if (formValue.length !== valueArray.current.length) {
+      valueArray.current = formValue.split("");
+    }
+  }, [formValue]);
 
   return (
     <div className={`keyboard`}>
-      <div
-        className={`keyboard__arrow`}
-        onClick={() => {
-          setHideKeyboard((pre) => !pre);
-        }}
-      >
-        <img
-          className={`${hideKeyboard ? "rotate" : ""}`}
-          src={img.i_arrowD}
-          alt="arrow"
-        />
-      </div>
-      <ul className={`${hideKeyboard ? "hidden--keyboard" : ""}`}>
+      <ul className={``}>
         <li
           className="btn btn--keyboard"
           style={{ backgroundColor: `#DE6868`, color: "white" }}
@@ -122,12 +120,13 @@ const Keyboard = (props) => {
           className="btn btn--keyboard"
           onClick={btnClickHandler}
         >
-          幹線
+          L
         </li>
         <li
           className="btn btn--keyboard"
           onClick={() => {
-            setValue([]);
+            valueArray.current = [];
+            setValue(valueArray.current);
           }}
         >
           C
@@ -138,9 +137,12 @@ const Keyboard = (props) => {
         <li
           className="btn btn--keyboard"
           onClick={() => {
-            setValue((pre) => {
-              return pre.slice(0, pre.length - 1);
-            });
+            valueArray.current = valueArray.current.slice(
+              0,
+              valueArray.current.length - 1
+            );
+
+            setValue(valueArray.current);
           }}
         >
           <img src={img.i_backspace} alt="backSpace" />

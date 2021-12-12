@@ -1,16 +1,23 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { action } from "../../store";
-import { getStopStartAndEndNameHelper, historyPush } from "../../helper";
+import {
+  getStopStartAndEndNameHelper,
+  historyPush,
+  local,
+  addToFavoriteHelper,
+} from "../../helper";
 import TargetBusPosition from "./targetBusPosition/targetBusPosition";
 import TargetBusTime from "./targetBusTime/targetBusTime";
 import TargetBusTitle from "./targetBusTitle/targetBusTitle";
 import Header from "../../components/header/header";
-import Nav from "../../components/nav/nav";
 import Popup from "../../components/popup";
+import UseDiv100 from "../../hook/useDiv100vh";
+import useDeviceCheck from "../../hook/useDeviceCheck";
 
 import "./targetBusDetail.scss";
 import img from "../../img";
+import LeafletMap from "../../components/leafletMap/leafletMap";
 
 const checkBack = (routeStops) => {
   if (routeStops.length === 1 && routeStops[0].Direction === 0) {
@@ -43,17 +50,38 @@ const listClickHandler = (mainSearchData, props, dispatch) => {
   }
 };
 
+const stopAddToFavorite = (data) => {
+  let localData = local.getLocal("stop");
+
+  if (localData[data.StopUID]) {
+    delete localData[data.StopUID];
+    local.storeInLocal("stop", localData);
+
+    return;
+  }
+
+  localData[data.StopUID] = {
+    stopUID: data.StopUID,
+    city: data.city,
+  };
+  local.storeInLocal("stop", localData);
+};
+
 const TargetBusDetail = (props) => {
-  const [height, setHeight] = useState(window.innerHeight);
+  const device = useDeviceCheck();
+  const [isFavor, setIsFavor] = useState(false);
   const [hide, setHide] = useState(false);
   const [direction, setDirection] = useState("0");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const stopIndex = useSelector((state) => state.stopIndex);
   const mainSearchData = useSelector((state) => state.mainSearchData);
   const target = useSelector((state) => state.targetBusRenderData.target);
   const routeStops = useSelector(
     (state) => state.targetBusRenderData.routeStops
   );
+
   const dispatch = useDispatch();
+  const height = UseDiv100();
 
   const popupOpenHandler = useCallback((content) => {
     if (content === "add") {
@@ -85,8 +113,15 @@ const TargetBusDetail = (props) => {
             style={{ cursor: "pointer" }}
             onClick={() => {
               popupOpenHandler("add");
-              mapClickHandler();
-              dispatch(action.setStopIndexCreator([i]));
+              if (device !== "normal") {
+                mapClickHandler();
+              }
+              dispatch(
+                action.setStopIndexCreator([
+                  i,
+                  { ...stopObj, city: target.city },
+                ])
+              );
             }}
           >
             {stopObj.StopName.Zh_tw}
@@ -97,11 +132,6 @@ const TargetBusDetail = (props) => {
   };
 
   useEffect(() => {
-    const heighCheck = () => {
-      setHeight(window.innerHeight);
-    };
-    window.addEventListener("resize", heighCheck);
-
     dispatch(
       action.fetchDataByRouteCreator({
         term: props.match.params.routeName,
@@ -111,12 +141,18 @@ const TargetBusDetail = (props) => {
 
     return () => {
       dispatch(action.clearTargetCreator());
-      window.removeEventListener("resize", heighCheck);
-      // console.log("clear");
     };
   }, []);
 
   useEffect(() => {
+    if (!target) return;
+
+    const localData = local.getLocal("route");
+    local.initLocalData();
+    if (localData[target.routeUID]) {
+      setIsFavor(true);
+    }
+
     setDirection("0");
     dispatch(action.changeDirectionCreator(true));
   }, [target]);
@@ -130,8 +166,17 @@ const TargetBusDetail = (props) => {
     listClickHandler(mainSearchData, props, dispatch);
   }, [mainSearchData]);
 
-  if (!target && !routeStops) {
-    return <></>;
+  if (!target || !routeStops) {
+    return (
+      <div className={`targetBusDetail `}>
+        <div className={`targetBusDetail__loading`}>
+          <div>
+            <img src={img.i_busLoading} alt="loading" />
+            <h1>等待公車進站...</h1>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -141,14 +186,18 @@ const TargetBusDetail = (props) => {
         color="black"
         className={`header-B ${!hide ? "" : "header--hidden"}`}
       />
-      {/* //// */}
+
       <TargetBusTitle
         className={`${!hide ? "" : "title--hidden"}`}
         direction={direction}
         mapClickHandler={mapClickHandler}
       />
-      {/* //// */}
-      <div className="targetBusDetail__main">
+      {/*------------------------------------main------------------------------------*/}
+      <div
+        className={`targetBusDetail__main ${
+          device === "normal" ? `pc--targetBusDetail__main` : ""
+        } `}
+      >
         {!hide ? (
           ""
         ) : (
@@ -160,8 +209,8 @@ const TargetBusDetail = (props) => {
             }}
           />
         )}
-        {/* //// */}
-        <div className="targetBusDetail__nav">
+        {/*------------------------------------main 的導航列------------------------------------*/}
+        <div className={`targetBusDetail__nav ${!hide ? "" : "nav--hidden"}`}>
           <div className="targetBusDetail__nav--stop">
             <p>行駛方向</p>
             <p>
@@ -173,31 +222,73 @@ const TargetBusDetail = (props) => {
               } 站`}
             </p>
           </div>
-          {!checkBack(routeStops) ? (
-            <div className="btn--icon targetBusDetail__nav--switch">
-              <img src={img.i_leftArrowW} alt="single" />
+          <div className="targetBusDetail__nav--bar">
+            <div className="listSmallCard__favor">
+              <img
+                style={{ cursor: "pointer" }}
+                alt="favor"
+                src={isFavor ? img.i_heartFill : img.i_heartLine}
+                onClick={(e) => {
+                  addToFavoriteHelper(
+                    "route",
+                    {
+                      routeUID: target.routeUID,
+                      routeName: target.routeName,
+                      data: { city: target.city },
+                      start: routeStops[0].Stops[0].StopName.Zh_tw,
+                      end: routeStops[0].Stops[routeStops[0].Stops.length - 1]
+                        .StopName.Zh_tw,
+                    },
+                    setIsFavor
+                  );
+                }}
+              />
             </div>
-          ) : (
             <div
-              className="btn btn--icon targetBusDetail__nav--switch"
+              className="btn  targetBusDetail__nav--refresh"
               onClick={() => {
-                dispatch(action.changeDirectionCreator());
-
-                if (direction === "1") {
-                  setDirection("0");
-                  return;
-                }
-                setDirection("1");
+                dispatch(
+                  action.reFetchNowBusCreator(
+                    target.routeUID,
+                    target.city,
+                    mainSearchData.data[props.match.params.routeName]
+                  )
+                );
               }}
             >
-              <img src={img.i_switch} alt="switch" />
+              <img src={img.i_loop} alt="refresh" />
             </div>
-          )}
+            {/*------------------------------------單向或雙向icon顯示------------------------------------*/}
+            {!checkBack(routeStops) ? (
+              <div className=" targetBusDetail__nav--switch">
+                <img src={img.i_leftArrowW} alt="single" />
+              </div>
+            ) : (
+              <div
+                className="btn  targetBusDetail__nav--switch"
+                onClick={() => {
+                  dispatch(action.changeDirectionCreator());
+
+                  if (direction === "1") {
+                    setDirection("0");
+                    return;
+                  }
+                  setDirection("1");
+                }}
+              >
+                <img src={img.i_switch} alt="switch" />
+              </div>
+            )}
+          </div>
         </div>
-        {/* //// */}
+        {/*------------------------------------路段詳細內容------------------------------------*/}
         <div
           className="targetBusDetail__container"
-          style={{ height: `${!hide ? `${height - 333}` : "200"}px` }}
+          style={
+            device === "normal"
+              ? { height: height - 380 + "px" }
+              : { height: `${!hide ? `${height - 338}` : "150"}px` }
+          }
         >
           <TargetBusTime direction={direction} />
           <ul className="targetBusDetail__container--stopName">
@@ -205,14 +296,22 @@ const TargetBusDetail = (props) => {
           </ul>
           <TargetBusPosition direction={direction} />
         </div>
+        {/*------------------------------------裝置監控 MAP------------------------------------*/}
+        {device === "normal" && (
+          <React.Fragment>
+            <LeafletMap />
+            {/* <Footer /> */}
+          </React.Fragment>
+        )}
       </div>
-      {/* //// */}
+      {/*------------------------------------popup------------------------------------*/}
       <Popup isPopupOpen={isPopupOpen} popUpOpenHandler={popupOpenHandler}>
         {isPopupOpen === "add" && (
           <div className="targetBusDetail__popup ">
             <div className="targetBusDetail__popup--btns">
               <p
                 onClick={() => {
+                  stopAddToFavorite(stopIndex[1]);
                   popupOpenHandler("success");
                 }}
               >
@@ -233,6 +332,7 @@ const TargetBusDetail = (props) => {
         {isPopupOpen === "success" && (
           <div className="targetBusDetail__popup ">
             <div className="targetBusDetail__popup--content">
+              {device === "normal" && <img src={img.addStop} alt="addStop" />}
               <p>已成功收藏此站牌</p>
             </div>
             <div className="targetBusDetail__popup--btns">
@@ -245,7 +345,7 @@ const TargetBusDetail = (props) => {
               </p>
               <p
                 onClick={() => {
-                  historyPush("/favorite");
+                  historyPush("/favorite/stop");
                 }}
               >
                 前往查看
@@ -259,5 +359,3 @@ const TargetBusDetail = (props) => {
 };
 
 export default TargetBusDetail;
-
-//一律用 routeUID get busGPS,busNext,Shape

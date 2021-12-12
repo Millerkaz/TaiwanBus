@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import Wkt from "wicket";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { action } from "../../store";
 import img from "../../img";
-import { historyPush } from "../../helper";
-import Header from "../header/header";
-import BtnBar from "../btnBar/btnBar";
+import UseDiv100 from "../../hook/useDiv100vh";
+import useDeviceCheck from "../../hook/useDeviceCheck";
 
 import "./leafletMap.scss";
 import "./icon.scss";
@@ -13,22 +12,24 @@ import "./icon.scss";
 export let map;
 export let myself = null;
 export let myselfPosition;
+
+const pinZoom = 17;
 let circle = null;
+let isFirstLocale = true;
 
 const wkt = new Wkt.Wkt();
 
-const searchZoom = 10;
-const pinZoom = 17;
-
-let isFirstLocale = true;
-
 export const listenMyselfPosition = (dispatch) => {
-  const myselfMarker = window.L.icon();
-
+  let yourPosition;
   const geoConfirmHandler = (e) => {
     if (isFirstLocale) {
-      map.setView(e.latlng, pinZoom);
-      dispatch(action.fetchNearStopDataCreator(map.getCenter()));
+      yourPosition = e.latlng;
+
+      //fake
+      // yourPosition = { lat: 25.1343511299213, lng: 121.80457448585939 };
+
+      map.setView(yourPosition, pinZoom);
+      dispatch(action.fetchNearStopDataCreator(yourPosition));
       // dispatch(action.fetchRestaurantDataCreator(map.getCenter()));
       isFirstLocale = false;
     }
@@ -39,15 +40,15 @@ export const listenMyselfPosition = (dispatch) => {
       map.removeLayer(circle);
     }
 
-    circle = window.L.circle(e.latlng, {
+    circle = window.L.circle(yourPosition, {
       color: "#FBD148",
       fillColor: "#FFE652",
       fillOpacity: 0.1,
       radius: 500,
     });
     circle.addTo(map);
-    myselfPosition = e.latlng;
-    myself = window.L.marker(e.latlng);
+    myselfPosition = yourPosition;
+    myself = window.L.marker(yourPosition);
     myself.bindPopup(``).addTo(map);
   };
 
@@ -67,75 +68,25 @@ export const listenMyselfPosition = (dispatch) => {
 const mapBuild = () => {
   map = window.L.map("map", { minZoom: 8 }).setView([23.8, 121], 8);
 
-  window.L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
-    attribution: `
-    &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`,
-  }).addTo(map);
+  // window.L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
+  //   attribution: `
+  //   &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`,
+  // }).addTo(map);
 
-  // window.L.tileLayer(
-  //   `https://tile.jawg.io/jawg-streets/{z}/{x}/{y}{r}.png?access-token=${process.env.REACT_APP_LEAFLET_KEY}`,
-  //   {}
-  // ).addTo(map);
+  window.L.tileLayer(
+    "https://tile.jawg.io/jawg-streets/{z}/{x}/{y}{r}.png?access-token=uxxK2Njo5PhdCpIFpwaHi3GWRrmfdyVpO79pXPbalf2clkVLsFTXk7AUPgsif0ys",
+    {}
+  ).addTo(map);
 
-  // map.attributionControl.addAttribution(
-  //   '<a href="https://www.jawg.io" target="_blank">&copy; Jawg</a> - <a href="https://www.openstreetmap.org" target="_blank">&copy; OpenStreetMap</a>&nbsp;contributors'
-  // );
-
-  // listenMyselfPosition(dispatch);
-
-  // const geoDenyHandler = () => {
-  //   init = true;
-  //   map.setView([25.037850742582183, 121.54882907867433], 18);
-  //   myself = window.L.marker([25.037850742582183, 121.54882907867433]);
-  //   myself.addTo(map);
-  // };
-
-  // map.on("locationerror", geoDenyHandler);
+  map.attributionControl.addAttribution(
+    '<a href="https://www.jawg.io" target="_blank">&copy; Jawg</a> - <a href="https://www.openstreetmap.org" target="_blank">&copy; OpenStreetMap</a>&nbsp;contributors'
+  );
 };
-
-// const renderStationDetail = (station) => {
-//   return `
-//   <div class="detailCard">
-//     <h3 class="detailCard__title">${station.name.tw[1]}</h3>
-//     <span class="detailCard__address">${station.address.Zh_tw}</span>
-//     <span class="detailCard__type">${station.name.tw[0]}</span>
-//     <div class="detailCard__bike">
-//       <h1>${station.canRentBikes}</h1>
-//       <h1>${station.needReturnBikes}</h1>
-//       <span>可借</span>
-//       <span>可還</span>
-//     </div>
-//     <button class="btn btn--detailCard" data-lat=${station.coords.lat} data-lng=${station.coords.lng}>搜尋附近美食</button>
-//   </div>
-//   `;
-// };
-
-// const renderRestaurantDetail = (shop) => {
-//   return `
-//   <div class="detailCard">
-//     <div class="detailCard__img">
-//       <img src=${shop.url ? shop.url : img.fakeRestaurant} alt=${
-//     shop.alt || "NO PICTURE"
-//   } onError="()=>{${img.fakeRestaurant}}"/>
-//     </div>
-//     <h3 class="detailCard__title">${shop.title}</h3>
-//     <span class="detailCard__address">${shop.address}</span>
-//     <span class="detailCard__type">${shop.open}</span>
-//   </div>
-//   `;
-// };
-
-// const mergeBikeData = (bikeDataFromState) => {
-//   return bikeDataFromState.bikeAvailableData.map((station, i) => {
-//     if (station.StationUID !== bikeDataFromState.bikeData[i].StationUID) return;
-
-//     return {
-
-// };
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-const LeafletMap = ({ hideStop }) => {
+const LeafletMap = (props) => {
+  const [hideStop, setHideStop] = useState(false);
   const shape = useSelector((state) => state.targetBusRenderData?.routeShape);
   const busPosition = useSelector(
     (state) => state.targetBusRenderData.busPosition
@@ -145,12 +96,31 @@ const LeafletMap = ({ hideStop }) => {
     (state) => state.targetBusRenderData.routeStops
   );
   const stopIndex = useSelector((state) => state.stopIndex);
-
+  const height = UseDiv100();
+  const device = useDeviceCheck();
   const busLine = useRef(null);
   const stopMarksArray = useRef(null);
   const stopOnMapGroup = useRef(null);
   const busMarkArray = useRef(null);
   const busOnMapGroup = useRef(null);
+  const nearMarksArray = useRef(null);
+  const nearMarksOnMapGroup = useRef(null);
+
+  const decideHeight = () => {
+    if (device === "normal" && props.page === "near") {
+      return { height: height - 53 + "px" };
+    }
+
+    if (device === "normal") {
+      {
+        return { height: height - 305 + "px" };
+      }
+    }
+
+    return { height: height + "px" };
+  };
+
+  /////////////////////////////////////////////////////////////////////////////////////////
 
   // 初始化 : 建立MAP
   useEffect(() => {
@@ -159,12 +129,20 @@ const LeafletMap = ({ hideStop }) => {
       map.setView(myselfPosition, 16);
     }
 
-    return () => {};
+    // const heighCheck = () => {
+    //   setHeight(window.innerHeight);
+    // };
+    // window.addEventListener("resize", heighCheck);
+
+    return () => {
+      // window.removeEventListener("resize", heighCheck);
+      // console.log("clear");
+    };
   }, []);
 
   //監聽 rerender : 公車實體線、行徑方向改變
   useEffect(() => {
-    if (!shape) {
+    if (!shape || shape.length === 0) {
       return;
     }
 
@@ -248,7 +226,9 @@ const LeafletMap = ({ hideStop }) => {
 
     stopOnMapGroup.current = window.L.layerGroup(stopMarksArray.current);
 
-    if (hideStop) return;
+    if (props.hideStop && device !== "normal") return;
+
+    if (hideStop && device === "normal") return;
 
     map.addLayer(stopOnMapGroup.current);
 
@@ -261,14 +241,18 @@ const LeafletMap = ({ hideStop }) => {
 
     map.removeLayer(stopOnMapGroup.current);
 
-    if (!hideStop) {
+    if (!props.hideStop && device !== "normal") {
       map.addLayer(stopOnMapGroup.current);
     }
-  }, [hideStop]);
+
+    if (!hideStop && device === "normal") {
+      map.addLayer(stopOnMapGroup.current);
+    }
+  }, [props.hideStop, hideStop]);
 
   //監聽 rerender : 公車位置、行徑方向改變
   useEffect(() => {
-    if (!busPosition) return;
+    if (!busPosition || !busPosition[Number(routeDirection)]) return;
 
     if (busOnMapGroup.current) {
       map.removeLayer(busOnMapGroup.current);
@@ -297,28 +281,32 @@ const LeafletMap = ({ hideStop }) => {
     map.flyTo(stopMarksArray.current[stopIndex[0]].getLatLng(), 18);
   }, [stopIndex]);
 
-  return <div id="map" className="map"></div>;
-};
+  //監聽附近站點顯示
+  useEffect(() => {
+    if (!props.stopsPosition) return;
 
-export default LeafletMap;
+    if (nearMarksOnMapGroup.current) {
+      map.removeLayer(nearMarksOnMapGroup.current);
+    }
 
-// <React.Fragment>
-{
-  /* <div className="leaflet__header">
-        <Header />
-        {target && (
-          <div className="leaflet__header--title">
-            <img
-              style={{ cursor: "pointer" }}
-              alt="back"
-              src={img.i_leftArrowB}
-              onClick={() => {
-                historyPush("/searchBus");
-              }}
-            />
-            <p>{`${target.routeName} 路線圖`}</p>
-          </div>
-        )}
+    nearMarksArray.current = props.stopsPosition.map((station) => {
+      return window.L.marker(station.coords, {
+        icon: window.L.icon({
+          iconUrl: img.i_streetsign,
+          className: "icon--nearStop",
+        }),
+      }).bindPopup(`${station.stationName} (${station.bearing})`);
+    });
+
+    nearMarksOnMapGroup.current = window.L.layerGroup(nearMarksArray.current);
+    map.addLayer(nearMarksOnMapGroup.current);
+  }, [props.stopsPosition]);
+
+  /////////////////////////////////////////////////////////////////////////////////////////
+
+  return (
+    <div className="leaflet">
+      {device === "normal" && props.page !== "near" && (
         <div className="leaflet__icons">
           <div
             className="leaflet__icons--switch"
@@ -334,14 +322,11 @@ export default LeafletMap;
               <img src={img.swithBtnOn} alt="openPoint" />
             )}
           </div>
-          {props.location.pathname === "/busMap" && (
-            <BtnBar className="leaflet__icons--position" />
-          )}
         </div>
-      </div> */
-}
+      )}
+      <div id="map" className="map" style={decideHeight()}></div>
+    </div>
+  );
+};
 
-// <div id="map" className="map"></div>
-{
-  /* </React.Fragment> */
-}
+export default LeafletMap;

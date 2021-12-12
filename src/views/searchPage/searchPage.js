@@ -1,16 +1,22 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
+import UseDiv100 from "../../hook/useDiv100vh";
+import useDeviceCheck from "../../hook/useDeviceCheck";
+
 import Header from "../../components/header/header";
 import UseRouteIDForm from "./useRouteIDForm/useRouteIDForm";
-import Keyboard from "../../components/keyboard/keyboard";
+import RouteIDForm from "./useRouteIDForm/routeIDForm_noRedux";
 import BusSearchList from "./busSearchList/busSearchList";
-import { useSelector } from "react-redux";
+import Keyboard from "../../components/keyboard/keyboard";
 
 import "./searchPage.scss";
 
 const SearchPage = (props) => {
+  const height = UseDiv100();
+  const device = useDeviceCheck();
+
   return (
-    <div className="searchPage">
+    <div className="searchPage" style={{ height: height }}>
       <div className="searchPage__header">
         <Header />
         <p>
@@ -20,9 +26,20 @@ const SearchPage = (props) => {
         </p>
         <UseRouteIDForm />
       </div>
-      <BusSearchList />
-      <div className="searchPage__keyboard">
-        <Keyboard />
+      <div
+        className="searchPage__container"
+        style={
+          device === "normal"
+            ? { height: `${height - 255}px` }
+            : { height: `${height - 315}px` }
+        }
+      >
+        <BusSearchList />
+        {device === "normal" && (
+          <div className="searchPage__keyboard">
+            <Keyboard />
+          </div>
+        )}
       </div>
     </div>
   );

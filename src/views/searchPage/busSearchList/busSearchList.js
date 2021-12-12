@@ -1,15 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
-// import BusSearchSideBar from "../busSearchSideBar/busSearchSideBar";
-import ListSmallCard from "../../../components/card/listSmallCard/listSmallCard";
-import TargetBusDetail from "../../targetBusDetail/targetBusDetail";
-import "./busSearchList.scss";
+import UseDiv100 from "../../../hook/useDiv100vh";
+import useDeviceCheck from "../../../hook/useDeviceCheck";
 import img from "../../../img";
+
+import ListSmallCard from "../../../components/card/listSmallCard/listSmallCard";
+
+import "./busSearchList.scss";
 
 const renderMainSearchData = (data) => {
   if (data.searchBy === "route") {
     return Object.entries(data.data).map(([key, value]) => {
-      let filterValue = value.find((route) => route.Direction === 0);
+      let filterValue = value.find(
+        (route) =>
+          route.Direction === 0 ||
+          route.Direction === 1 ||
+          route.Direction === 2
+      );
 
       let startEnd = `${filterValue.Stops[0].StopName.Zh_tw} <–> ${
         filterValue.Stops[filterValue.Stops.length - 1].StopName.Zh_tw
@@ -53,45 +60,80 @@ const renderMainSearchData = (data) => {
 };
 
 const BusSearchList = (props) => {
-  const mainSearchData = useSelector((state) => state.mainSearchData);
-  const [height, setHeight] = useState(window.innerHeight);
+  const { response, status, message } = useSelector((state) => state.PTXData);
+  const height = UseDiv100();
+  const device = useDeviceCheck();
 
-  useEffect(() => {
-    const heighCheck = () => {
-      setHeight(window.innerHeight);
-    };
-    window.addEventListener("resize", heighCheck);
+  let showContent;
 
-    return () => {
-      window.removeEventListener("resize", heighCheck);
-    };
-  }, []);
-
-  if (!mainSearchData.data) {
-    return (
-      <div className="busSearchList">
-        <div className="busSearchList__first">
-          <img src={img.searchBus} />
-          <p>尋找您的公車路線</p>
-        </div>
+  if (!status || !response) {
+    showContent = (
+      <div className="busSearchList__first">
+        <img src={img.searchBus} />
+        <p>尋找您的公車路線</p>
       </div>
     );
   }
 
-  if (Object.keys(mainSearchData.data).length === 0) {
-    return (
-      <div className="busSearchList">
-        <div className="busSearchList__no">
-          <img src={img.noBus} />
-          <p>很抱歉，找不到符合的路線</p>
-        </div>
+  if (status === "pending") {
+    showContent = (
+      <div className="busSearchList__no">
+        <img src={img.noBus} />
+        <p>Loading...</p>
       </div>
     );
+  }
+
+  if (status === "error") {
+    showContent = (
+      <div className="busSearchList__no">
+        <img src={img.noBus} />
+        <p>發生錯誤，請重新整理</p>
+        <p>{message}</p>
+      </div>
+    );
+  }
+
+  if (
+    response &&
+    Object.keys(response?.data).length === 0 &&
+    status === "success"
+  ) {
+    showContent = (
+      <div className="busSearchList__no">
+        <img src={img.noBus} />
+        <p>很抱歉，找不到符合的路線</p>
+      </div>
+    );
+  }
+
+  if (
+    response &&
+    Object.keys(response?.data).length !== 0 &&
+    status === "success"
+  ) {
+    showContent = renderMainSearchData(response);
   }
 
   return (
-    <div className="busSearchList" style={{ height: `${height - 300}px` }}>
-      {renderMainSearchData(mainSearchData)}
+    <div className="busSearchList">
+      {device === "normal" ? (
+        <div className="busSearchList__header">
+          <p>搜尋結果</p>
+        </div>
+      ) : (
+        ``
+      )}
+      <div
+        className="busSearchList__container"
+        style={
+          device === "normal"
+            ? { height: `${height - 355}px` }
+            : { height: `${height - 315}px` }
+        }
+      >
+        {showContent}
+      </div>
     </div>
   );
 };

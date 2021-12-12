@@ -1,13 +1,21 @@
+@import "../../../sass/variable.scss";
+
 .targetBusTitle {
-  height: 16.4rem;
-  background: #5a637e;
-  border-radius: 20px 20px 0px 0px;
-  transform: translateY(-2rem);
-  padding: 0 1.8rem;
+  height: 18rem;
+  background-color: #5a637e;
+  border-radius: 20px 20px 0 0;
+  // overflow: hidden;
+  transform: translateY(1rem);
+  padding: 0 1.8rem 2rem 1.8rem;
 
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
+
+  @include rwd(lap) {
+    transform: translateY(0);
+    height: 16.1rem;
+  }
 
   &__icons {
     display: flex;
@@ -31,6 +39,7 @@
   }
 
   &__target {
+    flex: 1;
     color: white;
     display: flex;
     flex-flow: column;
@@ -38,27 +47,67 @@
     padding-bottom: 1.1rem;
 
     h1 {
+      flex: 1;
       font-size: 2.4rem;
       font-family: inherit;
       line-height: 7rem;
       font-weight: 700;
+      width: 25rem;
+      text-align: end;
 
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+
+      @include rwd(m-small) {
+        width: 28rem;
+      }
+
+      @include rwd(m-medium) {
+        width: 40rem;
+      }
+
+      @include rwd(lap) {
+        width: 100%;
+        font-size: 3rem;
+      }
+
+      @include rwd(pc-b) {
+        font-size: 4rem;
+        text-align: center;
+      }
     }
     h3 {
+      flex: 1;
       display: flex;
-      align-items: center;
-
+      width: 25rem;
       font-size: 1.6rem;
       line-height: 2.3rem;
       font-family: inherit;
       font-weight: 400;
+      justify-content: flex-end;
+      align-items: center;
 
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+
+      @include rwd(m-small) {
+        width: 28rem;
+      }
+
+      @include rwd(m-medium) {
+        width: 40rem;
+      }
+
+      @include rwd(lap) {
+        width: 100%;
+        // font-size: 1.6rem;
+      }
+
+      @include rwd(pc-b) {
+        justify-content: center;
+      }
 
       img {
         margin: 0 0.5rem;

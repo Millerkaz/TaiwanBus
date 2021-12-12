@@ -4,12 +4,14 @@ import { map, myselfPosition } from "../leafletMap/leafletMap";
 import { Link } from "react-router-dom";
 import "./nav.scss";
 
+// 手機板專用浮動navigation
+
 const Nav = (props) => {
   return ReactDOM.createPortal(
     <nav className={`${!props.hide ? "" : "header--hidden"}`}>
       <div className="nav__container">
         <input type="checkbox" className="nav__hack" id="hack" />
-        <label for="hack" className={`nav__click`}>
+        <label htmlFor="hack" className={`nav__click`}>
           <span
             className={`nav__hamburger ${
               props.color === "black" && !props.hide ? `hamburger--B` : ``
@@ -37,11 +39,13 @@ const Nav = (props) => {
             </Link>
           </li>
           <li className="nav__item">
-            <p className="nav__link">班表查詢</p>
+            <Link to="/favorite/route" className="nav__link">
+              我的路段
+            </Link>
           </li>
           <li className="nav__item">
-            <Link to="/favorite" className="nav__link">
-              我的收藏
+            <Link to="/favorite/stop" className="nav__link">
+              我的站牌
             </Link>
           </li>
         </ul>

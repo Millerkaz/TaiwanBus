@@ -56,14 +56,34 @@
     margin-left: 0.65rem;
   }
 }
+.btn--dropdown {
+  background-color: white;
+  box-shadow: none;
+  color: #4c546a;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #bcc1d1;
+    color: #ffffff;
+    border-radius: 100px;
+  }
+}
 
 .btn--keyboard {
   border-radius: 10px;
   background-color: #e5e5e5;
   color: #4c546a;
+
+  &:hover {
+    cursor: pointer;
+    background-color: #e5e5e5;
+    opacity: 0.8;
+  }
 }
 
-.btn--dropdown {
+.btn--back {
+  padding: 2rem 0 0 2rem;
+  cursor: pointer;
 }
 
 .btn--icon {
@@ -73,6 +93,11 @@
   border-radius: 1000px;
   position: relative;
   margin-bottom: 0.4rem;
+
+  @include rwd(lap) {
+    width: 8rem;
+    height: 8rem;
+  }
 
   img {
     position: absolute;

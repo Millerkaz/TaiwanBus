@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import img from "../../img";
 import { useSelector } from "react-redux";
-import { historyPush } from "../../helper";
-import BtnBar from "../../components/btnBar/btnBar";
+import { historyPush, cityISO } from "../../helper";
+import useDeviceCheck from "../../hook/useDeviceCheck";
+import img from "../../img";
 
+import BtnBar from "../../components/btnBar/btnBar";
 import ListSmallCard from "../../components/card/listSmallCard/listSmallCard";
 import Header from "../../components/header/header";
 import LeafletMap from "../../components/leafletMap/leafletMap";
@@ -21,6 +22,7 @@ const renderNearData = (nearBusData) => {
         key={station.StationUID}
         stationAddress={station.StationAddress}
         stops={routes}
+        city={cityISO[station.LocationCityCode]}
       />
     );
   });
@@ -29,10 +31,11 @@ const renderNearData = (nearBusData) => {
 const NearSearchPage = (props) => {
   const target = useSelector((state) => state.targetBusRenderData.target);
   const nearBusData = useSelector((state) => state.nearBusData);
+  const device = useDeviceCheck();
   const [hideStop, setHideStop] = useState(false);
 
   return (
-    <React.Fragment>
+    <div className="nearSearchPage">
       <div className="nearSearchPage__header">
         <Header />
         {target && (
@@ -72,10 +75,23 @@ const NearSearchPage = (props) => {
           )}
         </div>
       </div>
-      <LeafletMap hideStop={hideStop} />
+      <LeafletMap
+        page={device === "normal" ? "near" : ""}
+        hideStop={hideStop}
+        stopsPosition={nearBusData.map((station) => {
+          return {
+            stationName: station.StationName.Zh_tw,
+            bearing: station.Bearing,
+            coords: {
+              lat: station.StationPosition.PositionLat,
+              lng: station.StationPosition.PositionLon,
+            },
+          };
+        })}
+      />
 
       <div className="nearSearchPage__list">{renderNearData(nearBusData)}</div>
-    </React.Fragment>
+    </div>
   );
 };
 export default NearSearchPage;

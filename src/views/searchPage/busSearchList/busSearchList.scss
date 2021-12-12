@@ -1,3 +1,5 @@
+@import "../../../sass/variable.scss";
+
 .busSearchList {
   margin-top: 2rem;
   // display: flex;
@@ -5,13 +7,58 @@
   flex-wrap: wrap;
   max-height: 70vh;
   overflow: auto;
+  position: relative;
+  overflow: hidden;
+
+  @include rwd(lap) {
+    // width: 50%;
+    flex: 0 1 49%;
+    background: #ffffff;
+    box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 20px;
+    // height: 55.4rem;
+    align-self: flex-start;
+  }
+
+  @include rwd(pc-b) {
+    // margin-right: 18rem;
+  }
+
+  &__header {
+    background: #5a637e;
+    height: 4.5rem;
+    // position: fixed;
+    width: 100%;
+    display: flex;
+    align-items: center;
+
+    p {
+      flex: 1;
+      font-weight: 500;
+      font-size: 2rem;
+      line-height: 2.9rem;
+      text-align: center;
+      color: white;
+    }
+  }
+
+  &__container {
+    overflow: auto;
+
+    // & > div:first-child {
+    //   margin-top: 0;
+    // }
+  }
 
   &__first {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
     img {
       width: 40rem;
       width: 20rem;
-      display: block;
-      margin: 10rem auto 0 auto;
     }
     p {
       color: #bcc1d1;
@@ -24,16 +71,28 @@
   }
 
   &__no {
-    // margin-top: 10rem;
     display: flex;
-    flex-flow: column;
     align-items: center;
+    flex-flow: column;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 
     img {
       width: 15rem;
       width: 10rem;
-      display: block;
-      margin: 10rem auto 0 auto;
+
+      // @include rwd(lap) {
+      //   position: absolute;
+      //   left: 50%;
+      //   transform: translateX(-50%);
+      // }
+
+      // @include rwd(pc-b) {
+      //   width: 35rem;
+      //   width: 15rem;
+      // }
     }
     p {
       color: #bcc1d1;
@@ -42,6 +101,17 @@
       line-height: 2.3rem;
       margin-top: 1.9rem;
       text-align: center;
+
+      // @include rwd(lap) {
+      //   position: absolute;
+      //   left: 50%;
+      //   top: 30rem;
+      //   transform: translateX(-50%);
+      // }
+      // @include rwd(pc-b) {
+      //   top: 40rem;
+      //   font-size: 2.4rem;
+      // }
     }
   }
 }

@@ -20,11 +20,57 @@ $color__font--btn: #ffffff;
 $color__bg--btn: #00a8c0;
 $color__bg--btn-hover: #009bb1;
 
-$rwd-largest: 1500px;
-$rwd-large: 1100px;
-$rwd-medium: 800px;
-$rwd-small: 700px;
-$rwd-smallest: 450px;
+$rwd-hugest: 1800px;
+$rwd-huge: 1500px;
+$rwd-largest: 1170px;
+$rwd-large: 850px;
+$rwd-medium: 700px;
+$rwd-small: 500px;
+$rwd-smallest: 375px;
+
+@mixin rwd($device) {
+  @if $device== m-small {
+    @media only screen and (min-width: $rwd-smallest) {
+      @content;
+    }
+  }
+
+  @if $device== m-medium {
+    @media only screen and (min-width: $rwd-small) {
+      @content;
+    }
+  }
+
+  @if $device== m-large {
+    @media only screen and (min-width: $rwd-medium) {
+      @content;
+    }
+  }
+
+  @if $device== lap {
+    @media only screen and (min-width: $rwd-large) {
+      @content;
+    }
+  }
+
+  @if $device== pc {
+    @media only screen and (min-width: $rwd-largest) {
+      @content;
+    }
+  }
+
+  @if $device== pc-b {
+    @media only screen and (min-width: $rwd-huge) {
+      @content;
+    }
+  }
+
+  @if $device== pc-l {
+    @media only screen and (min-width: $rwd-hugest) {
+      @content;
+    }
+  }
+}
 
 @keyframes moveToRight {
   0% {
@@ -69,5 +115,37 @@ $rwd-smallest: 450px;
   }
   100% {
     filter: drop-shadow(0px 0px 0px #00a8c0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(0.95);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  75% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes bus-in {
+  0% {
+    transform: scale(0);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
   }
 }

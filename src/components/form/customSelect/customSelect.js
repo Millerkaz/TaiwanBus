@@ -19,7 +19,6 @@ const CustomDropDown = (props) => {
 
   useEffect(() => {
     props.meta.dispatch(change(props.formName, "cityCH", value));
-    // props.meta.dispatch(change(props.formName, "term", ""));
   }, [value]);
 
   return (

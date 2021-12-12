@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "./input.scss";
 
 /**
@@ -10,11 +10,14 @@ import "./input.scss";
 
 const Input = (props) => {
   return (
-    <div className={`input ${props.className || ""}`}>
+    <div className={`input`}>
       <label>{props.label}</label>
       <input
+        className={` ${props.className || ""}`}
         type={props.type || "text"}
         placeholder={props.placeholder}
+        value={props.value}
+        onChange={props.onChange}
         {...props.input}
         required
       ></input>

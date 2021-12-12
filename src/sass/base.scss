@@ -24,35 +24,51 @@ svg {
 html {
   font-size: 62.5%;
   box-sizing: border-box;
-
-  // @media only screen and (max-width: $rwd-large) {
-  //   font-size: 50%;
-  // }
-
-  // @media only screen and (max-width: $rwd-medium) {
-  //   font-size: 45%;
-  // }
-
-  // @media only screen and (max-width: $rwd-small) {
-  //   font-size: 40%;
-  // }
-
-  // @media only screen and (max-width: $rwd-smallest) {
-  //   font-size: 30%;
-  // }
 }
 
 body {
   // width: 100%;
   width: 100%;
-  height: 100vh;
   font-family: "Noto Sans TC", sans-serif;
   position: relative;
-  // overflow: hidden;
+
+  @include rwd(lap) {
+    height: 100vh;
+    overflow: hidden;
+  }
+}
+
+#bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  clip-path: circle(60% at 50% 30%);
+  z-index: -1;
+  object-position: top right;
+
+  @include rwd(m-medium) {
+    clip-path: circle(60% at 50% 27%);
+  }
+
+  @include rwd(m-large) {
+    clip-path: ellipse(90% 60% at 50% 20%);
+  }
+
+  @include rwd(pc-l) {
+    clip-path: circle(96% at 50% -65%);
+    // animation: clip-in 3s 2s infinite;
+    transition: all 0.1s;
+  }
 }
 
 #root {
   position: relative;
+}
+
+#footer {
+  position: absolute;
+  bottom: 0%;
 }
 
 .img--hidden {

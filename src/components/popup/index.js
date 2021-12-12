@@ -1,9 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { useSelector, useDispatch } from "react-redux";
-import history from "../../helper/history";
-
-import { action } from "../../store";
 
 import "./popup.scss";
 

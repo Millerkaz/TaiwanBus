@@ -1,0 +1,77 @@
+.wrapper {
+  // padding-top: 8px;
+  transform: translateY(16px);
+  width: 350px;
+  height: 15px;
+  // height: 200px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.main-element {
+  position: absolute;
+  top: 10%;
+  left: 1%;
+  display: block;
+  // height: 98%;
+  width: 98%;
+  margin: auto;
+  align-self: center;
+  // background: #fff;
+  z-index: 1;
+}
+
+.border {
+  position: absolute;
+  display: block;
+  top: -60%;
+  left: -50%;
+  z-index: -9;
+  display: block;
+  height: 100%;
+  width: 200%;
+  // transform: rotate(-45deg);
+  overflow: hidden;
+  background: linear-gradient(
+    to right,
+    transparent 20%,
+    transparent 40%,
+    white 50%,
+    white 55%,
+    transparent 70%,
+    transparent 100%
+  );
+  background-size: 200% auto;
+
+  animation: shine 3s linear infinite;
+}
+
+/*Begin shimmer code*/
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+$anime-time: 8s;
+
+$box-size: 200px;
+$clip-distance: 0.01;
+$clip-size: $box-size * (1 + $clip-distance * 2);
+$path-width: 1px;
+
+$main-color: #69ca62;
+
+// $codepen-logo-path: url("//blog.codepen.io/wp-content/uploads/2012/06/Button-White-Large.png");
+
+%full-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+///////////////////////////////////////////////////////

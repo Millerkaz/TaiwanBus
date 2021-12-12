@@ -21,9 +21,15 @@ import i_stopIcon1 from "./icons/stopIcon1.svg";
 import i_busPosition from "./icons/busPosition.svg";
 import i_gps from "./icons/gps_fixed.png";
 import i_person from "./icons/person.png";
+import i_direction from "./icons/direction.svg";
+import i_ticket from "./icons/ticket.svg";
+import i_loop from "./icons/loop.svg";
+import i_streetsign from "./icons/streetsign.svg";
+import i_map from "./icons/map.svg";
+import i_busLoading from "./icons/busLoading.svg";
 
-import logo from "./logo.png";
-import logoB from "./logoB.png";
+import logo from "./logo.svg";
+import logoB from "./logoB.svg";
 import bg from "./bgPic.png";
 import bg2x from "./bgPic@2x.png";
 import bgMobile from "./bgMobile.png";
@@ -31,6 +37,7 @@ import noBus from "./noBus.svg";
 import searchBus from "./searchBus.svg";
 import swithBtnOff from "./swithBtnOff.png";
 import swithBtnOn from "./swithBtnOn.png";
+import addStop from "./addStop.png";
 
 const img = {
   i_arrowD,
@@ -65,6 +72,13 @@ const img = {
   swithBtnOn,
   i_gps,
   i_person,
+  i_direction,
+  i_ticket,
+  i_loop,
+  i_streetsign,
+  i_map,
+  i_busLoading,
+  addStop,
 };
 
 export default img;

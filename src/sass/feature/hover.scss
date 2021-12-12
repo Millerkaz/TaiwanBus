@@ -1,0 +1,94 @@
+@import "../variable.scss";
+
+.circle {
+  top: 0;
+  left: 0%;
+  width: 6.5rem;
+  height: 6.5rem;
+  position: absolute;
+  border-radius: 50%;
+
+  @include rwd(m-medium) {
+    width: 8rem;
+    height: 8rem;
+  }
+}
+
+.one {
+  background-color: rgba(#5cbcdb, 0.5);
+  font-size: 40px;
+  font-family: "Oswald", sans-serif;
+  letter-spacing: 1.5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: bold;
+  transition: 1s;
+}
+
+.two {
+  background-color: #5cbcdb;
+  transition: 1s;
+  opacity: 0.5;
+}
+
+.three {
+  background-color: #b4e0ee4d;
+  transition: 1s;
+  opacity: 0.5;
+}
+
+.four {
+  background-color: #316e824d;
+  transition: 1s;
+  opacity: 0.8;
+}
+.five {
+  background-color: #5cbcdb;
+  transition: 1s;
+  opacity: 1;
+}
+
+.cc {
+  position: relative;
+  width: 6.5rem;
+  height: 6.5rem;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+
+  @include rwd(m-medium) {
+    width: 8rem;
+    height: 8rem;
+  }
+
+  img {
+    width: 4rem;
+    height: 4rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+
+    @include rwd(m-medium) {
+      width: 5rem;
+      height: 5rem;
+    }
+  }
+}
+
+.cc:hover ~ .two {
+  transform: translate(0px, 75px);
+}
+.cc:hover ~ .three {
+  transform: translate(0px, -75px);
+}
+.cc:hover .four {
+  transform: translate(75px, 0px);
+}
+.cc:hover .five {
+  transform: translate(-75px, 0px);
+}

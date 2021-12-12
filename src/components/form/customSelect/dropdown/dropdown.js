@@ -2,6 +2,7 @@ import React from "react";
 import "./dropdown.scss";
 
 const Dropdown = (props) => {
+  console.log("re");
   return (
     <div className={`dropdown ${props.className || ""}`}>
       <h1>北部地區</h1>
@@ -177,4 +178,4 @@ const Dropdown = (props) => {
   );
 };
 
-export default Dropdown;
+export default React.memo(Dropdown);
